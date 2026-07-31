@@ -95,8 +95,40 @@
     white-space: nowrap;
   }
 
-  .header-toggle {
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     margin-left: auto;
+    align-self: center;
+  }
+
+  .nav-link {
+    min-height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--muted);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    border-color: var(--gold);
+    color: var(--gold2);
+    background: var(--gold-dim);
+    outline: none;
+  }
+
+  .header-toggle {
+    margin-left: 0;
     flex: 0 0 auto;
     width: 26px;
     height: 26px;
@@ -951,6 +983,9 @@
 
   @media (max-width: 720px) {
     header.topbar { padding: 12px 6% 8px; }
+    .site-nav { order: 10; width: 100%; margin-left: 0; }
+    .nav-link { flex: 1 1 0; }
+    .header-toggle { margin-left: auto; }
     .legend { display: none; }
     footer.foot-note { padding: 8px 6% 10px; }
 
@@ -1012,6 +1047,10 @@
       <span class="eyebrow">House of Aisin Gioro &middot; The Qing Imperial Genealogy</span>
       <h1>大清皇室世系谱</h1>
       <span class="subtitle">Nurhaci to Puyi &middot; 1616&ndash;1912</span>
+      <nav class="site-nav" aria-label="站点导航">
+        <a class="nav-link" href="./index.html">返回首页</a>
+        <a class="nav-link" href="./ming.html">切换至大明</a>
+      </nav>
       <button class="header-toggle" id="headerToggle" type="button" aria-expanded="true" aria-controls="headerBody" aria-label="收起表头">
         <svg class="chevron" viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7.5l5 5 5-5"/></svg>
       </button>

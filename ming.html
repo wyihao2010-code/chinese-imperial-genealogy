@@ -101,8 +101,40 @@
     white-space: nowrap;
   }
 
-  .header-toggle {
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     margin-left: auto;
+    align-self: center;
+  }
+
+  .nav-link {
+    min-height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--muted);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  }
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    border-color: var(--gold);
+    color: var(--gold2);
+    background: var(--gold-dim);
+    outline: none;
+  }
+
+  .header-toggle {
+    margin-left: 0;
     flex: 0 0 auto;
     width: 26px;
     height: 26px;
@@ -1088,6 +1120,9 @@
 
   @media (max-width: 720px) {
     header.topbar { padding: 12px 6% 8px; }
+    .site-nav { order: 10; width: 100%; margin-left: 0; }
+    .nav-link { flex: 1 1 0; }
+    .header-toggle { margin-left: auto; }
     .legend { display: none; }
     footer.foot-note { padding: 8px 6% 10px; }
 
@@ -1150,6 +1185,10 @@
         <h1>皇明谱</h1>
       </div>
       <p class="subtitle">大明王朝宗室谱系 · 十六帝正统与南明诸支</p>
+      <nav class="site-nav" aria-label="站点导航">
+        <a class="nav-link" href="./index.html">返回首页</a>
+        <a class="nav-link" href="./qing.html">切换至大清</a>
+      </nav>
       <button class="header-toggle" id="headerToggle" aria-expanded="true" aria-label="收起表头" type="button">
         <svg class="chevron" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
