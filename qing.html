@@ -1,0 +1,2835 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大清皇室世系谱 · 从太祖到宣统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400&family=Noto+Sans+SC:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090c;
+    --bg2: #0e0e12;
+    --bg3: #141418;
+    --text: #dfd9cc;
+    --text2: #f5f0e8;
+    --muted: #7d7870;
+    --dim: #3e3b35;
+    --gold: #c39e4f;
+    --gold2: #e8c97e;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-soft: rgba(255, 255, 255, 0.04);
+    --gold-dim: rgba(195, 158, 79, 0.15);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Noto Sans SC", sans-serif;
+    height: 100%;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---------- Header ---------- */
+
+  header.topbar {
+    flex: 0 0 auto;
+    padding: 14px 5% 10px;
+    border-bottom: 1px solid var(--border-soft);
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%);
+    position: relative;
+    z-index: 5;
+    transition: padding 0.3s ease;
+  }
+  header.topbar.collapsed { padding: 9px 5%; border-bottom-color: transparent; }
+
+  .header-bar {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+  }
+
+  .eyebrow {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  h1 {
+    font-family: "Noto Serif SC", serif;
+    font-weight: 200;
+    font-size: clamp(19px, 2.4vw, 24px);
+    letter-spacing: 0.06em;
+    color: var(--text2);
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .subtitle {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .header-toggle {
+    margin-left: auto;
+    flex: 0 0 auto;
+    width: 26px;
+    height: 26px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s ease, color 0.2s ease;
+    align-self: center;
+  }
+  .header-toggle:hover { border-color: var(--gold); color: var(--gold2); }
+  .header-toggle .chevron { transition: transform 0.3s var(--ease-out); }
+  header.topbar.collapsed .header-toggle .chevron { transform: rotate(180deg); }
+
+  /* 折叠区域：用 grid-template-rows 1fr/0fr 技巧实现平滑的“展开到自然高度”过渡，
+     无需 JS 测量 scrollHeight。 */
+  .header-body {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 0.32s var(--ease-out), opacity 0.25s ease, margin-top 0.32s ease;
+    opacity: 1;
+    margin-top: 10px;
+  }
+  .header-body-inner { overflow: hidden; min-height: 0; }
+  header.topbar.collapsed .header-body {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    margin-top: 0;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 32px;
+  }
+
+  .stats {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--dim);
+    white-space: nowrap;
+  }
+  .stats b { color: var(--muted); font-weight: 500; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 6px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    white-space: nowrap;
+    background: none;
+    border: 1px solid transparent;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .legend-item:hover { background: var(--border-soft); color: var(--text); }
+  .legend-item.active {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+    color: var(--gold2);
+  }
+
+  .swatch {
+    width: 22px;
+    height: 0;
+    border-top: 1.4px solid var(--gold);
+    flex: 0 0 auto;
+  }
+  .swatch.union { border-top-style: dashed; opacity: 0.7; }
+  .swatch.special { border-top-style: dotted; border-top-color: var(--gold2); border-top-width: 2px; }
+
+  .hint-scroll {
+    display: block;
+    font-family: "Noto Serif SC", serif;
+    font-weight: 300;
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.04em;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .filter-row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin-top: 9px;
+  }
+
+  /* ---------- Tree viewport ---------- */
+
+  main.tree-viewport {
+    flex: 1 1 auto;
+    overflow: hidden;
+    position: relative;
+    cursor: grab;
+    touch-action: none;
+    background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 34px 34px;
+  }
+
+  main.tree-viewport.grabbing { cursor: grabbing; }
+
+  .tree-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+  }
+
+  /* ---------- Zoom controls ---------- */
+
+  .zoom-controls {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    z-index: 15;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--border-soft);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .zoom-btn {
+    width: 34px;
+    height: 34px;
+    background: var(--bg2);
+    border: none;
+    color: var(--text);
+    font-size: 16px;
+    font-family: "Cormorant Garamond", serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .zoom-btn:hover { background: var(--bg3); color: var(--gold2); }
+  .zoom-btn.reset { font-size: 11px; letter-spacing: 0.03em; }
+
+  /* ---------- Search ---------- */
+
+  .search-wrap {
+    position: relative;
+    flex: 0 0 auto;
+    width: 220px;
+  }
+
+  .search-input {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: "Noto Sans SC", sans-serif;
+    font-size: 12.5px;
+    padding: 8px 30px 8px 12px;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .search-input::placeholder { color: var(--dim); }
+  .search-input:focus { border-color: var(--gold); }
+
+  .search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 4px;
+    display: none;
+    line-height: 1;
+  }
+  .search-clear.show { display: block; }
+  .search-clear:hover { color: var(--gold2); }
+
+  .search-results {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    max-height: 320px;
+    overflow-y: auto;
+    z-index: 30;
+    display: none;
+  }
+  .search-results.show { display: block; }
+
+  .search-result-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 9px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-soft);
+    transition: background 0.15s ease;
+  }
+  .search-result-item:last-child { border-bottom: none; }
+  .search-result-item:hover, .search-result-item.kb-active { background: var(--gold-dim); }
+  .search-result-zh {
+    font-family: "Noto Serif SC", serif;
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .search-result-role {
+    font-size: 10.5px;
+    color: var(--muted);
+  }
+  .search-empty {
+    padding: 14px 12px;
+    font-size: 11.5px;
+    color: var(--dim);
+    font-style: italic;
+  }
+
+  /* ---------- Minimap ---------- */
+
+  .minimap {
+    position: absolute;
+    left: 18px;
+    bottom: 18px;
+    z-index: 15;
+    background: rgba(14, 14, 18, 0.88);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+  }
+
+  .minimap canvas {
+    display: block;
+    cursor: pointer;
+  }
+
+  .minimap-viewport {
+    position: absolute;
+    border: 1.5px solid var(--gold2);
+    background: rgba(232, 201, 126, 0.08);
+    pointer-events: none;
+  }
+
+  /* ---------- Branch filter panel ---------- */
+
+  .branch-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .branch-btn {
+    font-size: 10.5px;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    cursor: pointer;
+    font-family: "Noto Sans SC", sans-serif;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .branch-btn:hover { border-color: var(--muted); color: var(--text); }
+  .branch-btn.active {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+    color: var(--gold2);
+  }
+
+  /* ---------- Node branch dimming (independent from hover/pin dimming) ---------- */
+
+  .node.branch-hidden { opacity: 0.08; }
+  #connectors path.branch-hidden,
+  #connectors circle.branch-hidden { opacity: 0.03 !important; }
+
+  .node.legend-hidden { opacity: 0.1; }
+  #connectors path.legend-hidden,
+  #connectors circle.legend-hidden { opacity: 0.04 !important; }
+
+  svg.connector-layer {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+    shape-rendering: geometricPrecision;
+  }
+
+  /* ---------- 世代背景带：用极淡的明暗交替 + 世代刻度，帮助在横向很长的谱系中
+     快速判断"这一片属于第几代"，纯视觉辅助，不涉及人物关系数据本身。 ---------- */
+  .gen-bands {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+    user-select: none;
+  }
+  .gen-band {
+    position: absolute;
+    left: 0;
+    border-top: 1px solid var(--border-soft);
+  }
+  .gen-band:nth-child(odd) { background: rgba(255, 255, 255, 0.012); }
+  .gen-band-label {
+    position: absolute;
+    left: 22px;
+    top: 10px;
+    font-family: "Noto Serif SC", serif;
+    font-weight: 300;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    opacity: 0.75;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+
+  .line-blood, .line-union, .line-special {
+    fill: none;
+    transition: opacity 0.3s ease, stroke 0.3s ease;
+  }
+  .line-blood   { stroke: var(--gold); stroke-width: 1.4; opacity: 0.52; }
+  .line-union   { stroke: var(--gold); stroke-width: 1.2; stroke-dasharray: 4 4; opacity: 0.34; }
+  .line-special { stroke: var(--gold2); stroke-width: 1.5; stroke-dasharray: 1 3.4; opacity: 0.58; }
+
+  .line-blood.active, .line-union.active, .line-special.active { opacity: 1; }
+  .line-blood.dimmed, .line-union.dimmed, .line-special.dimmed { opacity: 0.06; }
+
+  /* ---------- 血缘连线：父母 → 选中头像 的流光动效 ---------- */
+
+  svg.flow-layer {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+    shape-rendering: geometricPrecision;
+  }
+
+  .flow-path {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+    transition: opacity 0.35s var(--ease-out);
+  }
+  .flow-path.show { opacity: 1; }
+
+  .flow-path .flow-core {
+    fill: none;
+    stroke: var(--gold2);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-dasharray: 16 58;
+    filter: drop-shadow(0 0 2px var(--gold2)) drop-shadow(0 0 6px rgba(232, 201, 126, 0.75));
+    animation-name: flow-travel;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  .flow-path .flow-halo {
+    fill: none;
+    stroke: var(--gold2);
+    stroke-linecap: round;
+    stroke-width: 5;
+    stroke-dasharray: 16 58;
+    opacity: 0.28;
+    filter: blur(3px);
+    animation-name: flow-travel;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes flow-travel {
+    from { stroke-dashoffset: 0; }
+    to   { stroke-dashoffset: -740; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flow-path .flow-core, .flow-path .flow-halo { animation: none; }
+  }
+
+  .union-marker {
+    fill: var(--bg);
+    stroke: var(--gold);
+    stroke-width: 1;
+    transition: fill 0.3s ease, stroke 0.3s ease, opacity 0.3s ease;
+    opacity: 0.6;
+  }
+  .union-marker.active { fill: var(--gold2); stroke: var(--gold2); opacity: 1; }
+  .union-marker.dimmed { opacity: 0.06; }
+
+  /* ---------- Nodes ---------- */
+
+  .nodes-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .node,
+  .node * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.35s ease;
+  }
+
+  .node.dimmed { opacity: 0.26; }
+
+  .node:focus-visible .avatar {
+    outline: 2px solid var(--gold);
+    outline-offset: 4px;
+  }
+
+  .avatar {
+    position: relative;
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
+    flex: 0 0 auto;
+  }
+
+  /* ---------- 头像尺寸档位：帝王最大，重要宗王为默认尺寸，配偶/太后稍小，序祖最小 ---------- */
+  .avatar.tier-emperor { width: 80px; height: 80px; }
+  .avatar.tier-consort { width: 58px; height: 58px; }
+  .avatar.tier-minor   { width: 50px; height: 50px; }
+
+  .node.active .avatar {
+    border-color: var(--gold2);
+    box-shadow: 0 0 0 4px var(--gold-dim);
+    background: var(--bg3);
+  }
+
+  /* 父母节点的缓缓闪动效果：鼠标悬停或点选一个节点时，
+     其父母双方的头像以柔和的呼吸节奏明暗交替，与被选中节点本身的静态高亮区分开。 */
+  @keyframes parentPulse {
+    0%, 100% {
+      border-color: var(--border);
+      box-shadow: 0 0 0 0 rgba(232, 201, 126, 0);
+    }
+    50% {
+      border-color: var(--gold2);
+      box-shadow: 0 0 0 6px rgba(232, 201, 126, 0.22);
+    }
+  }
+  .node.parent-highlight .avatar {
+    animation: parentPulse 2.4s ease-in-out infinite;
+  }
+  /* 若父母节点同时恰好是当前被选中的节点自身(理论上不会发生，双重保险)，
+     静态高亮优先，不叠加动画，避免视觉冲突。 */
+  .node.active.parent-highlight .avatar { animation: none; }
+
+  .gender-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 1;
+    font-family: "Cormorant Garamond", "Noto Sans SC", serif;
+    transition: border-color 0.35s ease, background 0.35s ease, opacity 0.35s ease;
+  }
+  .gender-badge.male   { color: #8fb3d9; }
+  .gender-badge.female { color: #d99fb0; }
+  .node.active .gender-badge {
+    border-color: var(--gold2);
+    background: var(--bg3);
+  }
+
+  .emblem {
+    width: 38px;
+    height: 38px;
+    stroke: var(--gold);
+    color: var(--gold);
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.86;
+    shape-rendering: geometricPrecision;
+    transition: stroke 0.35s ease, color 0.35s ease, opacity 0.35s ease;
+  }
+  .node.active .emblem { stroke: var(--gold2); color: var(--gold2); opacity: 1; }
+  .avatar.tier-emperor .emblem { width: 46px; height: 46px; }
+  .avatar.tier-consort .emblem { width: 32px; height: 32px; }
+  .avatar.tier-minor .emblem   { width: 28px; height: 28px; }
+
+  .node-name-zh {
+    font-family: "Noto Serif SC", serif;
+    font-weight: 300;
+    font-size: 15px;
+    color: var(--text2);
+    white-space: nowrap;
+    transition: color 0.35s ease;
+  }
+  .node.active .node-name-zh { color: var(--gold2); }
+
+  .node-name-gr {
+    font-family: "Noto Serif SC", serif;
+    font-weight: 300;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  @keyframes nodeIn {
+    from { opacity: 0; transform: translate(-50%, -50%) translateY(12px); }
+    to   { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
+  }
+  .node.enter {
+    animation: nodeIn 0.7s var(--ease-out) both;
+  }
+
+  /* ---------- Tooltip ---------- */
+
+  .tooltip {
+    position: absolute;
+    max-width: 260px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+    padding: 14px 16px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    z-index: 20;
+    transform-origin: 0 0;
+  }
+  .tooltip.show { opacity: 1; }
+
+  .tooltip-name {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .tooltip-name .zh {
+    font-family: "Noto Serif SC", serif;
+    font-weight: 400;
+    font-size: 15px;
+    color: var(--text2);
+  }
+  .tooltip-name .gr {
+    font-family: "Noto Serif SC", serif;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .tooltip-role {
+    font-size: 11.5px;
+    color: var(--gold);
+    letter-spacing: 0.03em;
+    margin-bottom: 8px;
+  }
+  .tooltip-parents {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .tooltip-special {
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: var(--text);
+    border-top: 1px solid var(--border-soft);
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+  .tooltip-special .mark { color: var(--gold2); }
+  .tooltip-note {
+    font-size: 10.5px;
+    line-height: 1.6;
+    color: var(--dim);
+    margin-top: 6px;
+  }
+
+  /* ---------- Detail panel (右键打开的完整详情) ---------- */
+
+  .detail-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 4, 6, 0.62);
+    backdrop-filter: blur(3px);
+    z-index: 50;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+  }
+  .detail-overlay.show { display: flex; }
+  .detail-overlay.show.in { opacity: 1; }
+
+  .detail-panel {
+    width: min(420px, 88vw);
+    max-height: min(600px, 82vh);
+    overflow-y: auto;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    padding: 30px 30px 26px;
+    position: relative;
+    transform: translateY(10px);
+    transition: transform 0.22s var(--ease-out);
+  }
+  .detail-overlay.show.in .detail-panel { transform: translateY(0); }
+
+  .detail-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 28px;
+    height: 28px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .detail-close:hover { border-color: var(--gold); color: var(--gold2); }
+
+  .detail-branch-tag {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    color: var(--gold2);
+    background: var(--gold-dim);
+    border: 1px solid rgba(195, 158, 79, 0.3);
+    padding: 3px 9px;
+    margin-bottom: 14px;
+  }
+
+  .detail-name {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .detail-name .zh {
+    font-family: "Noto Serif SC", serif;
+    font-weight: 300;
+    font-size: 26px;
+    color: var(--text2);
+  }
+  .detail-name .gr {
+    font-family: "Noto Serif SC", serif;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .detail-roman {
+    font-size: 11.5px;
+    color: var(--dim);
+    letter-spacing: 0.02em;
+    margin-bottom: 10px;
+  }
+  .detail-roman .roman-name {
+    font-family: "Noto Serif SC", serif;
+    color: var(--gold2);
+  }
+  .detail-role {
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 0.03em;
+    margin-bottom: 4px;
+  }
+  .detail-kind {
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.03em;
+    margin-bottom: 18px;
+  }
+
+  .detail-section {
+    border-top: 1px solid var(--border-soft);
+    padding-top: 14px;
+    margin-top: 14px;
+  }
+  .detail-section-title {
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 9px;
+  }
+
+  .detail-rel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .detail-rel-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text);
+    background: none;
+    border: none;
+    padding: 3px 0;
+    cursor: pointer;
+    text-align: left;
+    font-family: "Noto Sans SC", sans-serif;
+    transition: color 0.15s ease;
+    width: 100%;
+  }
+  .detail-rel-item:hover { color: var(--gold2); }
+  .detail-rel-item .rel-tag {
+    flex: 0 0 auto;
+    font-size: 10px;
+    color: var(--dim);
+    min-width: 28px;
+  }
+  .detail-rel-item .rel-role {
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: auto;
+    padding-left: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .detail-empty {
+    font-size: 11.5px;
+    color: var(--dim);
+    font-style: italic;
+  }
+
+  .detail-special, .detail-note-text {
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: var(--text);
+  }
+  .detail-special .mark { color: var(--gold2); }
+  .detail-note-text { color: var(--muted); }
+
+  .detail-myth {
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: var(--text2);
+    border-left: 2px solid var(--gold);
+    padding-left: 14px;
+  }
+  .detail-myth-title {
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold2);
+    margin-bottom: 9px;
+  }
+
+  .myth-link {
+    color: var(--gold2);
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  .myth-link:hover, .myth-link:focus-visible {
+    color: var(--text2);
+    outline: none;
+  }
+
+  /* ---------- Footer ---------- */
+
+  footer.foot-note {
+    flex: 0 0 auto;
+    padding: 12px 5% 16px;
+    border-top: 1px solid var(--border-soft);
+    font-size: 10.5px;
+    line-height: 1.7;
+    color: var(--dim);
+    letter-spacing: 0.02em;
+  }
+
+  .foot-note-toggle {
+    display: none;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: var(--dim);
+    cursor: pointer;
+    text-align: left;
+  }
+  .foot-note-chevron {
+    flex: 0 0 auto;
+    font-size: 11px;
+    transition: transform 0.2s ease;
+    opacity: 0.7;
+  }
+  .foot-note-toggle[aria-expanded="true"] .foot-note-chevron { transform: rotate(180deg); }
+  .foot-note-full { }
+
+  /* ---------- Responsive ---------- */
+
+  @media (max-width: 720px) {
+    header.topbar { padding: 12px 6% 8px; }
+    .legend { display: none; }
+    footer.foot-note { padding: 8px 6% 10px; }
+
+    .foot-note-toggle { display: flex; }
+    .foot-note-full {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      margin-top: 0;
+      transition: max-height 0.25s ease, opacity 0.2s ease, margin-top 0.25s ease;
+    }
+    .foot-note-full.expanded {
+      max-height: 400px;
+      opacity: 1;
+      margin-top: 8px;
+    }
+
+    .foot-note-toggle { display: flex; }
+    .foot-note-summary {
+      font-size: 11px;
+      color: var(--gold);
+      opacity: 0.8;
+    }
+    .foot-note-full {
+      display: none;
+      margin-top: 8px;
+      max-height: 30vh;
+      overflow-y: auto;
+    }
+    .foot-note-full.expanded { display: block; }
+
+    .search-wrap { width: 100%; order: -1; }
+    .stats { order: 1; }
+
+    .filter-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .branch-btn { font-size: 10px; padding: 4px 9px; }
+
+    .minimap { display: none; }
+  }
+
+  @media (max-height: 480px) {
+    .filter-row { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .node, .avatar, .emblem, .node-name-zh,
+    .line-blood, .line-union, .line-special, .union-marker,
+    .tooltip {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <header class="topbar" id="topbar">
+    <div class="header-bar">
+      <span class="eyebrow">House of Aisin Gioro &middot; The Qing Imperial Genealogy</span>
+      <h1>大清皇室世系谱</h1>
+      <span class="subtitle">Nurhaci to Puyi &middot; 1616&ndash;1912</span>
+      <button class="header-toggle" id="headerToggle" type="button" aria-expanded="true" aria-controls="headerBody" aria-label="收起表头">
+        <svg class="chevron" viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7.5l5 5 5-5"/></svg>
+      </button>
+    </div>
+    <div class="header-body" id="headerBody">
+      <div class="header-body-inner">
+        <div class="meta-row">
+          <p class="stats" id="stats"></p>
+          <div class="search-wrap">
+            <input type="text" class="search-input" id="searchInput" placeholder="搜索人物姓名…" autocomplete="off" aria-label="搜索人物">
+            <button class="search-clear" id="searchClear" type="button" aria-label="清除搜索">&times;</button>
+            <div class="search-results" id="searchResults"></div>
+          </div>
+          <div class="legend" id="legend">
+            <button class="legend-item" data-filter-type="blood" type="button"><span class="swatch"></span>血缘传承</button>
+            <button class="legend-item" data-filter-type="union" type="button"><span class="swatch union"></span>婚姻 / 结合</button>
+            <button class="legend-item" data-filter-type="special" type="button"><span class="swatch special"></span>继嗣 / 兼祧</button>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div class="branch-filter" id="branchFilter"></div>
+          <p class="hint-scroll">拖拽平移 · 滚轮或按钮缩放 · 点按头像查看关联 · 双击聚焦子树</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="tree-viewport" id="viewport">
+    <div class="tree-canvas" id="canvas">
+      <div class="gen-bands" id="genBands"></div>
+      <svg class="connector-layer" id="connectors"></svg>
+      <svg class="connector-layer flow-layer" id="flowLayer"></svg>
+      <div class="nodes-layer" id="nodes"></div>
+      <div class="tooltip" id="tooltip"></div>
+    </div>
+    <div class="zoom-controls">
+      <button class="zoom-btn" id="zoomIn" type="button" aria-label="放大">+</button>
+      <button class="zoom-btn" id="zoomOut" type="button" aria-label="缩小">&minus;</button>
+      <button class="zoom-btn reset" id="zoomReset" type="button" aria-label="重置视图">100%</button>
+    </div>
+    <div class="minimap" id="minimap">
+      <canvas id="minimapCanvas"></canvas>
+      <div class="minimap-viewport" id="minimapViewport"></div>
+    </div>
+  </main>
+
+  <div class="detail-overlay" id="detailOverlay">
+    <div class="detail-panel" id="detailPanel" role="dialog" aria-modal="true" aria-labelledby="detailNameZh">
+      <button class="detail-close" id="detailClose" type="button" aria-label="关闭详情">&times;</button>
+      <div id="detailContent"></div>
+    </div>
+  </div>
+
+  <footer class="foot-note" id="footNote">
+    <button class="foot-note-toggle" id="footNoteToggle" type="button" aria-expanded="false">
+      <span class="foot-note-summary">谱系说明与取材范围</span>
+      <span class="foot-note-chevron">▾</span>
+    </button>
+    <div class="foot-note-full" id="footNoteFull">
+      本谱系为“大清皇室核心世系图”第一版：以皇位承统为主轴，覆盖清代十二帝、序祖二位、重要皇子宗王与皇后皇太后生母共约五十六人，未涵盖完整《爱新觉罗宗谱》的全部皇子、公主、侧室与旁支后裔。清代宗室惯例，正宫皇后未必是继位皇子的生母，图中已尽量将两者分别标出并置于对应男性节点两侧。晚清自同治帝以后，皇位不再单纯父子相承：金色实线表示本生血缘，金色虚线表示婚姻结合，亮金点线表示继嗣、兼祧等制度性承统关系，可点选图例分别高亮查看。人物早期生卒年份因史料记载差异，部分标注为约数。详情面板中的“终年”按传统虚岁计算（卒年减生年再加一），个别人物的卒年落在当年农历新年之前，虚岁与此简易算法可能相差一岁，已按史料通行说法逐一核对主要人物。
+    </div>
+  </footer>
+
+
+<script>
+/* =========================================================
+   数据层：人物 / 结合关系 / 世代行序
+   ========================================================= */
+
+const EMBLEMS = {
+  'crown-imperial': '<path d="M8 27 L8 16 L14 21 L20 10 L26 21 L32 16 L32 27 Z" stroke-linejoin="round"/><path d="M8 27 L32 27" /><path d="M13 27 L13 31 M20 27 L20 32 M27 27 L27 31" opacity="0.75"/>',
+  'phoenix':      '<path d="M20 10 Q26 12 26 19 Q26 25 20 30 Q14 25 14 19 Q14 12 20 10 Z" opacity="0.85"/><path d="M20 10 Q15 6 9 9 M20 10 Q25 6 31 9" opacity="0.6"/><path d="M20 30 L20 34" opacity="0.6"/>',
+  'orchid':       '<path d="M20 30 L20 14" opacity="0.8"/><path d="M20 18 Q13 15 12 8 Q19 10 20 18 Z" opacity="0.75"/><path d="M20 18 Q27 15 28 8 Q21 10 20 18 Z" opacity="0.75"/><path d="M20 14 Q16 8 20 5 Q24 8 20 14 Z" opacity="0.75"/>',
+  'court-rank':   '<path d="M20 9 L31 20 L20 31 L9 20 Z"/><circle cx="20" cy="20" r="4.5"/>',
+  'saber':        '<path d="M13 30 L27 11 M23 11 L28 11 L28 16 M11 32 L15 28" stroke-linecap="round"/>',
+  'seal':         '<path d="M11 12 L29 12 L29 30 L11 30 Z" opacity="0.85"/><path d="M20 8 Q17 8 17 12 M20 8 Q23 8 23 12" opacity="0.7"/><path d="M15 18 L25 18 M15 24 L25 24" opacity="0.5"/>',
+  'totem':        '<path d="M20 32 L20 12 M14 32 Q14 24 20 22 Q26 24 26 32 M14 18 L26 18 M20 12 L14 6 M20 12 L26 6" opacity="0.85"/>',
+  'brush':        '<path d="M25 8 L32 15 L18 29 L11 30 L12 23 Z" opacity="0.85"/><path d="M11 30 Q9 32 6 33" opacity="0.6"/>',
+  'default':      '<circle cx="20" cy="20" r="9"/><path d="M20 8 L20 11 M20 29 L20 32 M8 20 L11 20 M29 20 L32 20"/>',
+};
+
+// 每个人物：zh 中文名（最常用称号，帝王用年号，其余用本名或谥号／封号）
+// gr 次要标识（帝王为庙号＋讳名，宗王为封号，后妃为族姓或身份说明）
+// role 一句话身份定位 / parents 血缘父母(id数组，最多两位，均为真实血缘)
+// branches 可归属的多个分支筛选标签(数组) / tier 头像尺寸档位：emperor·prince·consort·minor
+// gender 性别 · roman 详情面板专用的生卒/在位年份 · special 继嗣/兼祧等特殊关系说明
+// myth 人物详传（用于故事性强的重点人物）/ note 补充说明
+const PEOPLE = {
+  juechangan: { branches:['early_princes'], zh:'觉昌安', gr:'清景祖 · 翼皇帝', role:'建州左卫指挥使 · 努尔哈赤祖父', parents:[], emblem:'totem', gender:'m', tier:'minor',
+    roman:'约1526–1583，约终年58岁' },
+  taksi: { branches:['early_princes'], zh:'塔克世', gr:'清显祖 · 宣皇帝', role:'建州左卫指挥使 · 努尔哈赤之父', parents:['juechangan'], emblem:'totem', gender:'m', tier:'minor',
+    roman:'约1543–1583，约终年41岁',
+    note:'觉昌安、塔克世父子于明万历十一年（1583年）明军攻打古勒寨时罹难，努尔哈赤以“遗甲十三副”起兵，是清朝开国叙事的起点。' },
+  nurhaci: { branches:['imperial_line', 'early_princes'], zh:'努尔哈赤', gr:'清太祖 · 天命', role:'后金开国之汗 · 十二帝之首', parents:['taksi'], emblem:'crown-imperial', gender:'m', tier:'emperor',
+    roman:'1559–1626，终年68岁　在位 1616–1626',
+    myth:'万历四十四年（1616年），努尔哈赤在赫图阿拉称汗，建立“大金”（史称后金），年号天命，正式与明朝分庭抗礼。他一生最重要的制度遗产是八旗制度——将女真各部编入旗籍，兵民合一，既是军事组织也是行政基础，此后近三百年始终是清朝统治的骨架。天命十一年（1626年）宁远之战负伤，同年去世，由第八子皇太极继承汗位。' },
+  menggu: { branches:['early_princes', 'consorts'], zh:'孟古哲哲', gr:'孝慈高皇后', role:'叶赫那拉氏 · 皇太极生母', parents:[], emblem:'orchid', gender:'f', tier:'consort',
+    roman:'1575–1603，终年29岁',
+    note:'叶赫部贝勒杨吉砮之女，努尔哈赤侧妃，皇太极生母，因皇太极即位而追封为孝慈高皇后。' },
+  huangtaiji: { branches:['imperial_line', 'early_princes'], zh:'皇太极', gr:'清太宗 · 天聪／崇德', role:'后金第二代大汗 · 大清开国皇帝', parents:['nurhaci', 'menggu'], emblem:'crown-imperial', gender:'m', tier:'emperor',
+    roman:'1592–1643，终年52岁　在位 1626–1643',
+    myth:'皇太极天命十一年（1626年）继承汗位，改元天聪。天聪十年（1636年），他在盛京称帝，改国号“大清”，改元崇德，正式确立皇帝称号与清朝国号，并将女真族名改为“满洲”。他在位期间强化中央集权、削弱其余三大贝勒的共治权力，为入关统一全国奠定制度基础。崇德八年（1643年）猝逝于清宁宫，未及册立继承人，由此引发多尔衮与豪格之间的汗位之争，最终以年幼的福临即位、多尔衮摄政作为妥协收场。' },
+  xiaoduanwen: { branches:['early_princes', 'consorts'], zh:'孝端文皇后', gr:'皇太极正宫皇后', role:'博尔济吉特氏 · 哲哲', parents:[], emblem:'phoenix', gender:'f', tier:'consort',
+    roman:'1600–1649，终年50岁',
+    note:'科尔沁蒙古贝勒莽古思之女，皇太极正宫中宫皇后，孝庄文皇后之姑母。她本人无子承嗣，皇位后由侄女孝庄所生的福临继承——清初“满蒙联姻”格局中正宫未必是生母的典型例证。' },
+  xiaozhuang: { branches:['early_princes', 'consorts'], zh:'孝庄文皇后', gr:'福临生母 · 两朝太后', role:'博尔济吉特氏 · 布木布泰', parents:[], emblem:'phoenix', gender:'f', tier:'consort',
+    roman:'1613–1688，终年76岁',
+    myth:'孝庄本是皇太极的侧妃，并非正宫，却因所生之子福临在崇德八年（1643年）的汗位之争中被推为妥协人选而登上历史舞台。此后她历经顺治、康熙两朝，是清初政局中最具影响力的女性人物之一，民间盛传她在多尔衮摄政期间以政治手腕维系幼帝地位，并亲自扶持幼年玄烨（康熙帝）稳定朝局、平定三藩。她去世后谥号“孝庄文皇后”，因迟迟未与皇太极合葬昭陵而在清代礼制史上留下著名的悬案。' },
+  chuying: { branches:['early_princes'], zh:'褚英', gr:'广略贝勒', role:'努尔哈赤长子 · 首位被废嗣子', parents:['nurhaci'], emblem:'saber', gender:'m', tier:'prince',
+    roman:'1580–1615，终年36岁',
+    note:'努尔哈赤原定的继承人，因专断跋扈、与四大贝勒交恶，于天命元年（1616年）前一年被幽禁并处死，是清朝开国史上第一次“太子之废”，其后胤礽的两立两废可视为同一权力困境的重演。' },
+  daishan: { branches:['early_princes'], zh:'代善', gr:'礼烈亲王 · 礼亲王系始祖', role:'努尔哈赤次子 · 四大贝勒之首', parents:['nurhaci'], emblem:'saber', gender:'m', tier:'prince',
+    roman:'1583–1648，终年66岁',
+    note:'崇德八年皇太极猝逝后，代善以宗室元老身份主持推举，力促福临即位、多尔衮与济尔哈朗共同辅政，避免了一场几乎爆发的内战。所封礼亲王为清初“铁帽子王”世袭罔替之首。' },
+  abatai: { branches:['early_princes'], zh:'阿巴泰', gr:'饶余敏郡王', role:'努尔哈赤第七子 · 战功宗王', parents:['nurhaci'], emblem:'saber', gender:'m', tier:'prince',
+    roman:'1589–1646，终年58岁' },
+  ajige: { branches:['early_princes'], zh:'阿济格', gr:'英亲王', role:'努尔哈赤第十二子 · 多尔衮同母兄', parents:['nurhaci'], emblem:'saber', gender:'m', tier:'prince',
+    roman:'1605–1651，终年47岁',
+    note:'与多尔衮、多铎同为大妃阿巴亥所生，顺治七年多尔衮死后失势，次年以谋乱罪被赐死，封爵削除。' },
+  dorgon: { branches:['early_princes'], zh:'多尔衮', gr:'睿忠亲王 · 摄政王', role:'努尔哈赤第十四子 · 入关首功', parents:['nurhaci'], emblem:'seal', gender:'m', tier:'prince',
+    roman:'1612–1650，终年39岁',
+    myth:'崇德八年皇太极猝逝，多尔衮与豪格争夺汗位僵持不下，最终由代善等宗室提议：由皇太极幼子福临继位，多尔衮与济尔哈朗共同摄政——这一妥协结果，使多尔衮成为顺治初年事实上的最高统治者。他主持了清军入关、定都北京、追击李自成与南明诸政权，为清朝统一全国立下首功，一度被尊为“皇父摄政王”。顺治七年（1650年）狩猎途中意外身亡，死后仅两个月即被顺治帝追论谋逆之罪，掘墓毁尸，直至乾隆年间才被平反、追复睿亲王封号。' },
+  dodo: { branches:['early_princes'], zh:'多铎', gr:'豫通亲王', role:'努尔哈赤第十五子 · 多尔衮同母弟', parents:['nurhaci'], emblem:'saber', gender:'m', tier:'prince',
+    roman:'1614–1649，终年36岁',
+    note:'清军入关后率军攻灭南明弘光政权、平定江南，是清初诸王中战功最著者之一，顺治六年因天花去世。' },
+  haoge: { branches:['early_princes'], zh:'豪格', gr:'肃武亲王', role:'皇太极长子 · 汗位之争落败者', parents:['huangtaiji'], emblem:'saber', gender:'m', tier:'prince',
+    roman:'1609–1648，终年40岁',
+    note:'崇德八年汗位之争中呼声最高的候选人之一，因两黄旗与两白旗势力相持不下而落败，福临继位后仍屡建战功，顺治五年却被多尔衮构陷下狱，死于囚所。' },
+  fulin: { branches:['imperial_line', 'early_princes'], zh:'顺治', gr:'清世祖 · 讳福临', role:'大清入关首位皇帝 · 十二帝第三位', parents:['huangtaiji', 'xiaozhuang'], emblem:'crown-imperial', gender:'m', tier:'emperor',
+    roman:'1638–1661，终年24岁　在位 1643–1661',
+    note:'六岁即位，先后由多尔衮、母后孝庄扶持渡过幼年摄政期，亲政后推行满汉一体等政策，年仅二十四岁病逝，遗诏传位第三子玄烨。' },
+  shuose: { branches:['early_princes'], zh:'硕塞', gr:'承泽裕亲王', role:'皇太极第五子', parents:['huangtaiji'], emblem:'saber', gender:'m', tier:'prince',
+    roman:'1629–1655，终年27岁' },
+  xiaokangzhang: { branches:['early_princes', 'consorts'], zh:'孝康章皇后', gr:'玄烨（康熙）生母', role:'佟佳氏', parents:[], emblem:'phoenix', gender:'f', tier:'consort',
+    roman:'1640–1663，终年24岁',
+    note:'顺治帝庶妃，玄烨生母，玄烨即位后追尊为皇太后，惜未及受封而早逝。' },
+  fuquan: { branches:['kangxi_sons'], zh:'福全', gr:'裕宪亲王', role:'顺治帝第二子 · 玄烨异母兄', parents:['fulin'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1653–1703，终年51岁',
+    note:'终生辅佐玄烨，曾统兵征噶尔丹，兄弟情谊在清代宗室中颇受称道。' },
+  xuanye: { branches:['imperial_line', 'kangxi_sons'], zh:'康熙', gr:'清圣祖 · 讳玄烨', role:'在位61年 · 清代在位最久的皇帝', parents:['fulin', 'xiaokangzhang'], emblem:'crown-imperial', gender:'m', tier:'emperor',
+    roman:'1654–1722，终年69岁　在位 1662–1722',
+    myth:'八岁即位，十四岁亲政后智擒鳌拜、平定三藩、收复台湾、亲征噶尔丹，奠定清朝极盛版图。他晚年最深的政治困扰，来自皇太子胤礽的两次废立：康熙十四年（1675年）即立嫡长子胤礽为皇太子，四十七年（1708年）以其暴戾淫乱、结党乱政为由第一次废黜，次年一度复立，五十一年（1712年）再度废黜并终身禁锢——由此引发诸子公开角逐储位，史称“九子夺嫡”。玄烨终其一生未再明立太子，直至去世前以遗诏传位皇四子胤禛，围绕遗诏真伪的争议延续至今仍是清史悬案。' },
+  xiaogongren: { branches:['kangxi_sons', 'consorts'], zh:'孝恭仁皇后', gr:'胤禛（雍正）、胤禵生母', role:'乌雅氏', parents:[], emblem:'phoenix', gender:'f', tier:'consort',
+    roman:'1660–1723，终年64岁',
+    note:'康熙帝德妃，同时是四阿哥胤禛与十四阿哥胤禵的生母——九子夺嫡中分处两大阵营的一对同母兄弟，皆出自她一人。雍正即位后尊为仁寿皇太后，半年后即去世，母子关系在诸多野史演绎中众说纷纭。' },
+  yinti: { branches:['kangxi_sons'], zh:'胤禔', gr:'大阿哥', role:'康熙长子 · 首告胤礽被圈禁终身', parents:['xuanye'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1672–1734，终年63岁' },
+  yinreng: { branches:['kangxi_sons'], zh:'胤礽', gr:'废太子 · 理密亲王', role:'康熙嫡长子 · 两立两废之皇太子', parents:['xuanye'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1674–1725，终年52岁',
+    myth:'一岁时即被康熙帝立为皇太子，是清代唯一一位公开册立、名分昭然的储君。康熙四十七年（1708年）以行事乖戾、暴虐淫乱为由第一次被废，次年复立，五十一年（1712年）再度、也是最后一次被废并终身圈禁于咸安宫，雍正二年（1725年）去世。他两立两废的经历，直接触发了兄弟诸子公开角逐储位的“九子夺嫡”，也促使雍正帝日后创立秘密建储制度，此后终清一代不再公开册立太子。' },
+  yinzhi: { branches:['kangxi_sons'], zh:'胤祉', gr:'诚隐郡王', role:'康熙第三子 · 主持编纂《古今图书集成》', parents:['xuanye'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1677–1732，终年56岁' },
+  yinzhen: { branches:['imperial_line', 'kangxi_sons'], zh:'雍正', gr:'清世宗 · 讳胤禛', role:'九子夺嫡最终胜出者', parents:['xuanye', 'xiaogongren'], emblem:'crown-imperial', gender:'m', tier:'emperor',
+    roman:'1678–1735，终年58岁　在位 1722–1735',
+    myth:'在长达数十年的储位角逐中，胤禛表面上不结党、不张扬，暗中却经营深厚，最终于康熙六十一年（1722年）以遗诏继位，改元雍正——即位之初围绕遗诏真伪的质疑从未真正平息。他即位后随即对昔日政敌大力清算：废太子胤礽早已圈禁，八阿哥胤禩、九阿哥胤禟被削宗籍、改恶名囚死，十四阿哥胤禵（他的同母弟）被夺爵幽禁。为杜绝储位公开争夺重演，他创设“秘密建储”制度——将继承人姓名写入密旨，藏于乾清宫“正大光明”匾后，直至驾崩后方才启封，此后终清一代沿用此制。' },
+  yinsi: { branches:['kangxi_sons'], zh:'胤禩', gr:'廉亲王 · 八爷党领袖', role:'康熙第八子 · 雍正朝削籍囚死', parents:['xuanye'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1681–1726，终年46岁',
+    note:'素有贤名，党羽众多，是九子夺嫡中胤禛最大的政治对手。雍正四年（1726年）被削宗籍、改名“阿其那”，同年幽禁而死。' },
+  yintang: { branches:['kangxi_sons'], zh:'胤禟', gr:'九阿哥', role:'康熙第九子 · 八爷党核心成员', parents:['xuanye'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1683–1726，终年44岁',
+    note:'雍正四年被削宗籍、改名“塞思黑”，同年囚死于保定，与胤禩同为雍正清算九子夺嫡旧怨最惨烈的两例。' },
+  yine: { branches:['kangxi_sons'], zh:'胤䄉', gr:'敦郡王', role:'康熙第十子 · 八爷党成员', parents:['xuanye'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1683–1741，终年59岁' },
+  yinxiang: { branches:['kangxi_sons'], zh:'胤祥', gr:'怡贤亲王', role:'康熙第十三子 · 雍正朝股肱重臣', parents:['xuanye'], emblem:'seal', gender:'m', tier:'prince',
+    roman:'1686–1730，终年45岁',
+    note:'九子夺嫡中始终坚定支持胤禛，雍正即位后倚为最信任的宗室重臣，总理户部、军机要务，去世后追赠“怡贤亲王”，怡亲王一支是清代少数世袭罔替的“铁帽子王”之一。' },
+  yinti14: { branches:['kangxi_sons'], zh:'胤禵', gr:'恂郡王 · 抚远大将军', role:'康熙第十四子 · 胤禛同母弟', parents:['xuanye', 'xiaogongren'], emblem:'saber', gender:'m', tier:'prince',
+    roman:'1688–1755，终年68岁',
+    note:'与雍正帝胤禛同为孝恭仁皇后所生，康熙晚年出任抚远大将军、统兵西北，一度被视为储位有力人选，雍正即位后被夺爵幽禁，是九子夺嫡兄弟阋墙最鲜明的一例。' },
+  xiaosheng: { branches:['qianlong_sons', 'consorts'], zh:'孝圣宪皇后', gr:'弘历（乾隆）生母', role:'钮祜禄氏', parents:[], emblem:'phoenix', gender:'f', tier:'consort',
+    roman:'1692–1777，终年86岁',
+    note:'雍正帝熹妃，弘历生母，乾隆即位后尊为崇庆皇太后，享寿八十六岁，是清代享寿最高的皇太后之一。' },
+  hongshi: { branches:['qianlong_sons'], zh:'弘时', gr:'雍正第三子', role:'因言行获罪削宗籍', parents:['yinzhen'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1704–1727，终年24岁' },
+  hongli: { branches:['imperial_line', 'qianlong_sons'], zh:'乾隆', gr:'清高宗 · 讳弘历', role:'实际执政逾63年 · 清朝极盛之主', parents:['yinzhen', 'xiaosheng'], emblem:'crown-imperial', gender:'m', tier:'emperor',
+    roman:'1711–1799，终年89岁　在位 1735–1796',
+    note:'在位六十年后为示不逾祖父康熙在位年数，主动禅位于皇十五子颙琰，自称太上皇，实际仍掌大权直至嘉庆四年（1799年）去世，前后掌国逾六十三年，是中国历史上实际执政时间最长的皇帝。' },
+  hongzhou: { branches:['qianlong_sons'], zh:'弘昼', gr:'和恭亲王', role:'乾隆五弟 · 以佯狂避祸著称', parents:['yinzhen'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1712–1770，终年59岁',
+    note:'素与乾隆帝交好，却常年佯装荒诞不经、屡有出格之举（如生前为自己筹办丧礼、大宴宾客“活出殡”），民间多解读为其在皇权高压下自污以求自保的处世智慧。' },
+  yongqi: { branches:['qianlong_sons'], zh:'永琪', gr:'荣纯亲王', role:'乾隆第五子 · 深得帝心', parents:['hongli'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1741–1766，终年26岁',
+    note:'文武双全，一度被认为最有希望继位，惜英年早逝，未及正式建储。' },
+  yongyan: { branches:['imperial_line', 'qianlong_sons'], zh:'嘉庆', gr:'清仁宗 · 讳颙琰', role:'乾隆内禅所立之君', parents:['hongli'], emblem:'crown-imperial', gender:'m', tier:'emperor',
+    roman:'1760–1820，终年61岁　在位 1796–1820',
+    note:'乾隆六十年（1795年）以秘密建储诏立为皇太子，次年受禅登基，改元嘉庆，但太上皇乾隆仍掌实权三年多，嘉庆四年乾隆去世后方真正亲政，随即处置权臣和珅。' },
+  yonglin: { branches:['qianlong_sons'], zh:'永璘', gr:'庆僖亲王', role:'乾隆第十七子 · 幼子', parents:['hongli'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1766–1820，终年55岁' },
+  yongxing: { branches:['qianlong_sons'], zh:'永瑆', gr:'成哲亲王', role:'乾隆第十一子 · 清代著名书法家', parents:['hongli'], emblem:'brush', gender:'m', tier:'prince',
+    roman:'1752–1823，终年72岁',
+    note:'与刘墉、翁方纲、铁保并称清中期四大书法家，是清代宗室中罕见以艺文著称者。' },
+  xiaoshurui: { branches:['consorts'], zh:'孝淑睿皇后', gr:'旻宁（道光）生母', role:'喜塔腊氏', parents:[], emblem:'phoenix', gender:'f', tier:'consort',
+    roman:'1760–1797，终年38岁',
+    note:'嘉庆帝嫡福晋，旻宁生母，未及嘉庆登基即已病逝，追尊为孝淑睿皇后。' },
+  miankai: { branches:[], zh:'绵恺', gr:'惇恪亲王', role:'嘉庆第三子', parents:['yongyan'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1795–1838，终年44岁' },
+  minning: { branches:['imperial_line', 'chunwangfu', 'gongwangfu'], zh:'道光', gr:'清宣宗 · 讳旻宁', role:'鸦片战争爆发时的在位皇帝', parents:['yongyan', 'xiaoshurui'], emblem:'crown-imperial', gender:'m', tier:'emperor',
+    roman:'1782–1850，终年69岁　在位 1820–1850',
+    note:'即位前名绵宁，依清代宗室避讳惯例，登基后改“绵”为“旻”以避免臣民日后触讳，是清代宗室命名制度的一个缩影。在位期间爆发第一次鸦片战争，签订《南京条约》，是近代中国被迫开放的起点。第六子奕訢（恭亲王）、第七子奕譞（醇亲王）在其身后的晚清政局中形成两支影响深远的宗室力量。' },
+  mianxin: { branches:[], zh:'绵忻', gr:'瑞怀亲王', role:'嘉庆第四子', parents:['yongyan'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1805–1828，终年24岁' },
+  xiaoquancheng: { branches:['consorts'], zh:'孝全成皇后', gr:'奕詝（咸丰）生母', role:'钮祜禄氏', parents:[], emblem:'phoenix', gender:'f', tier:'consort',
+    roman:'1808–1840，终年33岁',
+    note:'道光帝皇后，奕詝生母，先于道光帝去世，未及子嗣登基。' },
+  yizhu: { branches:['imperial_line', 'succession'], zh:'咸丰', gr:'清文宗 · 讳奕詝', role:'道光第四子 · 英法联军时的在位皇帝', parents:['minning', 'xiaoquancheng'], emblem:'crown-imperial', gender:'m', tier:'emperor',
+    roman:'1831–1861，终年31岁　在位 1850–1861',
+    special:'其独子载淳（同治帝）身后无嗣，咸丰一系遂由其侄载湉（醇亲王奕譞之子，光绪帝）入承为嗣，兼祧关系详见“继嗣与兼祧”分支。',
+    myth:'在位期间内忧外患交织：太平天国席卷南方，第二次鸦片战争爆发，咸丰十年（1860年）英法联军攻入北京，圆明园被焚毁，咸丰帝仓皇北狩热河，次年病逝于避暑山庄，年仅三十一岁。临终前任命肃顺等八大臣辅政，却未料身后爆发“辛酉政变”——皇后钮祜禄氏（后为慈安太后）与懿贵妃叶赫那拉氏（后为慈禧太后）联合恭亲王奕訢发动政变，肃顺等八大臣或诛或黜，改由两宫太后“垂帘听政”，自此开启晚清近半个世纪的太后主政格局。' },
+  yixin: { branches:['gongwangfu'], zh:'奕訢', gr:'恭忠亲王 · 恭亲王系始祖', role:'道光第六子 · 洋务运动核心人物', parents:['minning'], emblem:'seal', gender:'m', tier:'prince',
+    roman:'1833–1898，终年66岁',
+    myth:'道光帝生前曾在传位诏书中同时提及皇四子奕詝与皇六子奕訢，最终确立奕詝继位、封奕訢为恭亲王，是清代皇位传承中少见的“兄终未及弟”的记载。辛酉政变中，他与两宫太后联手扳倒顾命八大臣，出任议政王、领班军机大臣，此后主持设立总理各国事务衙门，是晚清洋务运动最重要的宗室推动者之一，史称“鬼子六”。' },
+  yixuan: { branches:['chunwangfu'], zh:'奕譞', gr:'醇贤亲王 · 醇亲王系始祖', role:'道光第七子 · 两代皇帝生父／祖父', parents:['minning'], emblem:'seal', gender:'m', tier:'prince',
+    roman:'1840–1891，终年52岁',
+    note:'其子载湉入承大统为光绪帝，其孙溥仪（载沣之子）后为宣统帝——醇亲王一支由此成为清朝最后两位皇帝的血脉源头，晚清政局中地位极为特殊。曾总理海军事务，主持修复颐和园，与恭亲王奕訢一系形成晚清宗室政治中并立的两大支系。' },
+  xiaozhen: { branches:['consorts'], zh:'慈安太后', gr:'东太后 · 孝贞显皇后', role:'钮祜禄氏 · 咸丰帝皇后', parents:[], emblem:'phoenix', gender:'f', tier:'consort',
+    roman:'1837–1881，终年45岁',
+    note:'咸丰帝正宫皇后，辛酉政变后与懿贵妃（慈禧）并称“两宫太后”共同垂帘听政，居内廷正统地位，光绪七年（1881年）暴亡，死因在清代野史中众说纷纭。' },
+  cixi: { branches:['consorts'], zh:'慈禧太后', gr:'西太后 · 孝钦显皇后', role:'叶赫那拉氏 · 同治帝生母', parents:[], emblem:'phoenix', gender:'f', tier:'consort',
+    roman:'1835–1908，终年74岁',
+    myth:'原为咸丰帝懿贵妃，因所生独子载淳（同治帝）而在咸丰帝死后母以子贵，联合恭亲王奕訢发动辛酉政变，此后以“垂帘听政”之名执掌晚清朝政近半个世纪，历经同治、光绪两朝。同治帝、光绪帝皆无嗣而终，两次由她主导择立幼帝：先立胞妹之子载湉（光绪），再于自己病重之际、光绪帝去世前一日仓促定溥仪入继大统——她本人也在光绪帝去世后仅一日随之病逝，晚清最后两次皇位继承均系于她一人之手。' },
+  wanzhen: { branches:['chunwangfu', 'consorts'], zh:'叶赫那拉·婉贞', gr:'醇亲王嫡福晋', role:'慈禧太后胞妹 · 载湉（光绪）生母', parents:[], emblem:'orchid', gender:'f', tier:'consort',
+    roman:'1841–1896，终年56岁',
+    note:'慈禧太后亲妹，奉懿旨嫁予醇亲王奕譞为嫡福晋，其子载湉因同治帝无嗣，由姨母慈禧择立入承大统，成为光绪帝——这使她同时成为一位皇帝（同治）的姨母与另一位皇帝（光绪）的生母，是清代宗室联姻中颇为罕见的一例。' },
+  zaichun: { branches:['imperial_line', 'succession'], zh:'同治', gr:'清穆宗 · 讳载淳', role:'咸丰独子 · 两宫垂帘首位在位者', parents:['yizhu', 'cixi'], emblem:'crown-imperial', gender:'m', tier:'emperor',
+    roman:'1856–1875，终年19岁　在位 1861–1875',
+    special:'身后无嗣，其堂弟兼姨表弟载湉入承咸丰一系为嗣而登基（光绪帝），后溥仪即位又制度性地兼承同治一系宗祧，详见“继嗣与兼祧”分支。',
+    note:'六岁即位，终其一生由两宫太后垂帘听政，十九岁病逝（一说死于天花，一说死于梅毒，清代官方记载与民间传说分歧极大），未及真正独掌朝政。因其无嗣，晚清皇位继承自此脱离直系父子相承，转入醇亲王一支。' },
+  zaitian: { branches:['imperial_line', 'chunwangfu', 'succession'], zh:'光绪', gr:'清德宗 · 讳载湉', role:'醇亲王之子 · 入承咸丰一系', parents:['yixuan', 'wanzhen'], emblem:'crown-imperial', gender:'m', tier:'emperor',
+    roman:'1871–1908，终年38岁　在位 1875–1908',
+    special:'本生父为醇亲王奕譞，因堂兄兼姨表兄同治帝载淳身后无嗣，奉慈禧太后懿旨入承咸丰帝一系为嗣而登基，与本生父母一系仍保有血缘关系，二者并存构成清代著名的“兼祧”个案。',
+    myth:'四岁由姨母兼伯母慈禧太后拥立入宫继位，是清代唯一一位以外藩宗室之子身份入承大统的皇帝。亲政后于光绪二十四年（1898年）任用康有为、梁启超推行“戊戌变法”，试图仿效日本明治维新自上而下改革，仅历时一百零三天即因慈禧太后为首的保守势力发动“戊戌政变”而失败，六君子被杀，光绪帝本人被幽禁于中南海瀛台，此后名义在位实则失去实权长达十年。光绪三十四年（1908年）十月，他与慈禧太后在相隔不到一日内相继去世；2008年的法医检测证实他确系砒霜中毒身亡，但幕后是何人下毒，至今仍是清史悬案。' },
+  longyu: { branches:['consorts'], zh:'隆裕太后', gr:'孝定景皇后', role:'叶赫那拉氏 · 光绪帝皇后', parents:[], emblem:'phoenix', gender:'f', tier:'consort',
+    roman:'1868–1913，终年46岁',
+    note:'慈禧太后胞弟之女，光绪帝表姐兼皇后，二人并无子嗣。宣统三年（1912年），正是由她以太后名义颁布《退位诏书》，代表清朝皇室宣告逊位，终结中国两千余年帝制。' },
+  zaifeng: { branches:['chunwangfu'], zh:'载沣', gr:'摄政王', role:'光绪异母弟 · 溥仪之父', parents:['yixuan'], emblem:'seal', gender:'m', tier:'prince',
+    roman:'1883–1951，终年69岁',
+    note:'奕譞之子，光绪帝异母弟。光绪帝、慈禧太后相继去世后，遵慈禧遗命由其三岁之子溥仪继位，他以摄政王身份代理国政，直至宣统三年（1912年）清帝逊位，是清朝最后一位在位的实际执政者。' },
+  wanlan: { branches:['chunwangfu', 'consorts'], zh:'瓜尔佳·幼兰', gr:'摄政王嫡福晋', role:'溥仪生母', parents:[], emblem:'orchid', gender:'f', tier:'consort',
+    roman:'1884–1921，终年38岁',
+    note:'军机大臣荣禄之女，奉慈禧太后懿旨指婚载沣，其子溥仪三岁入宫继位为宣统帝。' },
+  puyi: { branches:['imperial_line', 'chunwangfu', 'succession'], zh:'溥仪', gr:'清逊帝 · 宣统', role:'末代皇帝 · 三岁登基 · 六岁逊位', parents:['zaifeng', 'wanlan'], emblem:'crown-imperial', gender:'m', tier:'emperor',
+    roman:'1906–1967，终年62岁　在位 1908–1912',
+    special:'本生父为摄政王载沣，因光绪帝、同治帝皆无嗣，奉慈禧太后遗命入承大统，制度上“承继穆宗（同治）为嗣，兼承德宗（光绪）之祧”，是清代兼祧关系最复杂、也是最后一例。',
+    myth:'光绪三十四年（1908年）十月，光绪帝与慈禧太后相继去世前一日，三岁的溥仪被抱入宫中继位，年号宣统。宣统三年（1912年）二月十二日，在隆裕太后颁布的《退位诏书》中，他以六岁之龄逊位，清朝、也是中国两千余年帝制正式终结。此后他历经张勋复辟、伪满洲国傀儡皇帝、战犯改造等跌宕经历，1967年病逝于北京，是中国历史上身份转折最为剧烈的末代君主之一。' },
+  wanrong: { branches:['consorts'], zh:'婉容', gr:'溥仪皇后', role:'郭布罗氏', parents:[], emblem:'orchid', gender:'f', tier:'consort',
+    roman:'1906–1946，终年41岁' },
+  pujie: { branches:['chunwangfu'], zh:'溥杰', gr:'溥仪之弟', role:'载沣次子', parents:['zaifeng'], emblem:'court-rank', gender:'m', tier:'prince',
+    roman:'1907–1994，终年88岁' }
+};
+
+// 婚姻 / 结合关系：同代夫妻绘制水平虚线＋结合点标记，子女的血缘线由结合点汇出
+const UNIONS = [
+  { a:'nurhaci', b:'menggu' },
+  { a:'huangtaiji', b:'xiaoduanwen' },
+  { a:'huangtaiji', b:'xiaozhuang' },
+  { a:'fulin', b:'xiaokangzhang' },
+  { a:'xuanye', b:'xiaogongren' },
+  { a:'yinzhen', b:'xiaosheng' },
+  { a:'yongyan', b:'xiaoshurui' },
+  { a:'minning', b:'xiaoquancheng' },
+  { a:'yizhu', b:'xiaozhen' },
+  { a:'yizhu', b:'cixi' },
+  { a:'yixuan', b:'wanzhen' },
+  { a:'zaitian', b:'longyu' },
+  { a:'zaifeng', b:'wanlan' },
+  { a:'puyi', b:'wanrong' }
+];
+
+// 继嗣 / 兼祧 / 承统关系：不改变本生血缘(parents 仍记录真实生身父母)，
+// 仅额外绘制一条亮金点线，表示制度上的过继承统关系，并纳入关联高亮
+const SUCCESSIONS = [
+  { from:'yizhu', to:'zaitian', label:'入承文宗（咸丰）为嗣，兼祧关系' },
+  { from:'zaichun', to:'puyi', label:'承继穆宗（同治）为嗣' },
+  { from:'zaitian', to:'puyi', label:'兼承德宗（光绪）之祧' }
+];
+
+// 世代行序：共13代，序祖层(努尔哈赤祖辈)在最上方，逐代向下延伸至清末宗室。
+// 每行为一个 [id, col] 数组，col 为列号（可用小数精细对齐），主线帝系尽量保持列号相近，
+// 配偶紧邻其夫所在列，兄弟宗王向两侧展开。
+const ROWS = [
+  // 第0代：序祖
+  [['juechangan', 5]],
+  // 第1代：显祖
+  [['taksi', 5]],
+  // 第2代：清朝开国
+  [['nurhaci', 5], ['menggu', 6.3]],
+  // 第3代：开国诸王
+  [['huangtaiji', 6.2], ['xiaoduanwen', 7.5], ['xiaozhuang', 8.8], ['chuying', 1], ['daishan', 2.3], ['abatai', 3.6], ['ajige', 4.9], ['dorgon', 10.1], ['dodo', 11.4]],
+  // 第4代：顺治一代
+  [['haoge', 4.5], ['fulin', 6.2], ['xiaokangzhang', 7.5], ['shuose', 8.9]],
+  // 第5代：康熙一代
+  [['fuquan', 4.9], ['xuanye', 6.2], ['xiaogongren', 7.5]],
+  // 第6代：九子夺嫡
+  [['yinti', 1], ['yinreng', 2.3], ['yinzhi', 3.6], ['yinzhen', 6.2], ['xiaosheng', 7.5], ['yinsi', 8.8], ['yintang', 10.1], ['yine', 11.4], ['yinxiang', 12.7], ['yinti14', 14]],
+  // 第7代：乾隆一代
+  [['hongshi', 4.9], ['hongli', 6.2], ['hongzhou', 7.5]],
+  // 第8代：嘉庆一代
+  [['yongqi', 3.6], ['yongyan', 6.2], ['xiaoshurui', 7.5], ['yonglin', 8.8], ['yongxing', 10.1]],
+  // 第9代：道光一代
+  [['miankai', 4.9], ['minning', 6.2], ['xiaoquancheng', 7.5], ['mianxin', 8.8]],
+  // 第10代：晚清三支分叉
+  [['yizhu', 4.9], ['xiaozhen', 6.2], ['cixi', 7.5], ['yixin', 9.2], ['yixuan', 10.7], ['wanzhen', 12]],
+  // 第11代：同治·光绪·摄政
+  [['zaichun', 4.9], ['zaitian', 10], ['longyu', 11.3], ['zaifeng', 12.6], ['wanlan', 13.9]],
+  // 第12代：清末宗室
+  [['puyi', 12], ['wanrong', 13.3], ['pujie', 14.6]]
+];
+
+/* =========================================================
+   布局常量
+   ========================================================= */
+
+const COL = 168;
+const LEFT_PAD = 70;
+const ROW_Y = [40, 220, 400, 600, 830, 1030, 1230, 1460, 1660, 1860, 2060, 2260, 2460];
+const ROW_LABELS = ['序祖', '显祖', '清朝开国', '开国诸王', '顺治一代', '康熙一代', '九子夺嫡', '乾隆一代', '嘉庆一代', '道光一代', '晚清三支分叉', '同治·光绪·摄政', '清末宗室']; // 与 ROW_Y 一一对应，用于世代背景带标签
+const AVATAR_R = 34;
+const LABEL_CLEAR = 78;  // 起点：父节点行 y + 此值（跳过头像与名字标签）
+const TOP_GAP = 40;      // 终点：子节点行 y - 此值（在头像上方留白）
+const MIN_NODE_GAP = 42; // 同一视觉子行内，相邻头像边缘到边缘的最小留白
+const MIN_COL_GAP = (AVATAR_R * 2 + MIN_NODE_GAP) / COL; // 换算成对应的最小列间距
+
+// ROWS 每一项支持两种写法：
+//   'id'                 → 沿用该行内的自动顺序列号（col = 到目前为止已放置的条目数）
+//   ['id', col]          → 显式指定列号（可为小数，用于精细对齐），并推进自动列计数到 col+1
+//   ['id', col, yOffset] → 额外指定行内纵向偏移(px)，用于同一世代内错落排布密集分支，
+//                          避免横向过宽；血缘/结合连线按实际 y 坐标计算，不受影响。
+// 本谱系每行人物数量适中（最多10人），全部使用 ['id', col] 形式即可清晰排布，未用到 yOffset。
+function computePositions() {
+  const pos = {};
+  let maxCol = 0;
+  ROWS.forEach((row, gi) => {
+    let autoCol = 0;
+    const entries = [];
+    row.forEach(entry => {
+      let id, col, yOffset = 0;
+      if (Array.isArray(entry)) {
+        id = entry[0];
+        col = entry.length > 1 && entry[1] !== null ? entry[1] : autoCol;
+        yOffset = entry.length > 2 && entry[2] !== null ? entry[2] : 0;
+      } else {
+        id = entry;
+        col = autoCol;
+      }
+      entries.push({ id, col, yOffset });
+      autoCol = col + 1;
+    });
+
+    // 手工指定的列号有时会让相邻头像贴得过近甚至重叠（尤其是在两个既有节点
+    // 之间插入某一世系分支节点时）。这里按“同一纵向偏移（即同一视觉子行）”
+    // 分组，从左到右顺序纠正：若相邻列间距小于 MIN_COL_GAP，则把靠右的节点
+    // 顺延推开，直到满足最小间距为止；已足够宽松的间距不受影响。纵向偏移
+    // 不同的节点视觉上本就错开、互不遮挡，因此分组独立处理。
+    const byOffset = {};
+    entries.forEach(e => { (byOffset[e.yOffset] = byOffset[e.yOffset] || []).push(e); });
+    Object.values(byOffset).forEach(group => {
+      group.sort((a, b) => a.col - b.col);
+      group.forEach((e, i) => {
+        e.adjCol = i === 0 ? e.col : Math.max(e.col, group[i - 1].adjCol + MIN_COL_GAP);
+      });
+    });
+
+    entries.forEach(e => {
+      pos[e.id] = { x: LEFT_PAD + (e.adjCol + 0.5) * COL, y: ROW_Y[gi] + e.yOffset, row: gi, col: e.adjCol };
+      if (e.adjCol + 1 > maxCol) maxCol = e.adjCol + 1;
+    });
+  });
+  return { pos, maxCol };
+}
+
+const { pos: POS, maxCol: MAX_COL } = computePositions();
+const CANVAS_W = LEFT_PAD * 2 + MAX_COL * COL;
+const CANVAS_H = ROW_Y[ROW_Y.length - 1] + 140;
+let UNION_ANCHORS = {}; // key: a|b -> 结合锚点，供血缘连线及流光效果复用
+
+/* =========================================================
+   连线锚点：处理同代结合（水平）与跨代结合（斜线）
+   ========================================================= */
+
+function unionAnchor(u) {
+  const a = POS[u.a], b = POS[u.b];
+  if (!a || !b) return null;
+  if (a.row === b.row) {
+    // 水平结合线：起止点收缩到头像边缘，避免被头像遮挡，
+    // 圆点固定在两头像正中间
+    const left = a.x < b.x ? a : b;
+    const right = a.x < b.x ? b : a;
+    const midX = (a.x + b.x) / 2;
+    return {
+      x: midX, y: a.y,
+      lines: [{
+        from: { x: left.x + AVATAR_R, y: left.y },
+        to:   { x: right.x - AVATAR_R, y: right.y },
+        style: 'horizontal'
+      }]
+    };
+  }
+  const lower = a.y > b.y ? a : b;
+  const higher = a.y > b.y ? b : a;
+  const anchor = { x: (a.x + b.x) / 2, y: lower.y };
+  // 跨代斜线：起点固定在上方头像正下方、跳过 LABEL_CLEAR（头像+中英文名标签）之后，
+  // 与 bloodPathD 的血缘线起点规则保持一致，避免虚线穿过下方文字
+  const startX = higher.x;
+  const startY = higher.y + LABEL_CLEAR;
+  return {
+    x: anchor.x, y: anchor.y,
+    lines: [{ from: { x: startX, y: startY }, to: anchor, style: 'diagonal' }]
+  };
+}
+
+/* =========================================================
+   SVG 渲染：连线层
+   ========================================================= */
+
+function bloodPathD(parentX, parentYRow, childX, childYRow) {
+  const y1 = parentYRow + LABEL_CLEAR;
+  const y2 = childYRow - TOP_GAP;
+  const midY = (y1 + y2) / 2;
+  return `M ${parentX} ${y1} C ${parentX} ${midY}, ${childX} ${midY}, ${childX} ${y2}`;
+}
+
+function renderGenBands() {
+  const box = document.getElementById('genBands');
+  box.style.width = CANVAS_W + 'px';
+  box.style.height = CANVAS_H + 'px';
+
+  // 每条带的上下边界取相邻世代行 y 坐标的中点，首尾延伸到画布边缘，
+  // 这样交替底色的分界线落在两代之间的空白处，不会切过任何头像。
+  const bounds = ROW_Y.map((y, i) => {
+    const top = i === 0 ? 0 : (ROW_Y[i - 1] + y) / 2;
+    const bottom = i === ROW_Y.length - 1 ? CANVAS_H : (y + ROW_Y[i + 1]) / 2;
+    return { top, bottom };
+  });
+
+  box.innerHTML = bounds.map((b, i) =>
+    `<div class="gen-band" style="top:${b.top}px; height:${b.bottom - b.top}px; width:${CANVAS_W}px;"></div>
+     <span class="gen-band-label" style="top:${b.top + 8}px;">第${i}代 · ${ROW_LABELS[i] || ''}</span>`
+  ).join('');
+}
+
+
+function renderConnectors() {
+  const svg = document.getElementById('connectors');
+  svg.setAttribute('width', CANVAS_W);
+  svg.setAttribute('height', CANVAS_H);
+  svg.setAttribute('viewBox', `0 0 ${CANVAS_W} ${CANVAS_H}`);
+
+  const flowSvg = document.getElementById('flowLayer');
+  flowSvg.setAttribute('width', CANVAS_W);
+  flowSvg.setAttribute('height', CANVAS_H);
+  flowSvg.setAttribute('viewBox', `0 0 ${CANVAS_W} ${CANVAS_H}`);
+
+  const parts = [];
+
+  // 结合 / 婚姻连线（含跨代斜线）+ 结合点标记
+  const unionAnchors = UNION_ANCHORS; // key: a|b -> anchor point，供子节点血缘线复用
+  Object.keys(unionAnchors).forEach(k => delete unionAnchors[k]);
+  UNIONS.forEach(u => {
+    const anc = unionAnchor(u);
+    if (!anc) return;
+    const cls = u.type === 'primordial' ? 'line-union' : 'line-union';
+    anc.lines.forEach(ln => {
+      parts.push(`<path class="${cls}" data-a="${u.a}" data-b="${u.b}" d="M ${ln.from.x} ${ln.from.y} L ${ln.to.x} ${ln.to.y}"/>`);
+    });
+    parts.push(`<circle class="union-marker" data-a="${u.a}" data-b="${u.b}" cx="${anc.x}" cy="${anc.y}" r="3.2"/>`);
+    unionAnchors[u.a + '|' + u.b] = anc;
+    unionAnchors[u.b + '|' + u.a] = anc;
+  });
+
+  // 血缘连线：单亲 or 双亲（双亲优先复用结合点作为起点）。parents 数组在本谱系中
+  // 始终记录真实生身父母，故一律使用实线 line-blood；p.special 仅为文字说明字段
+  // （见"继嗣与兼祧"人物的补充文字），不影响此处的连线样式。
+  Object.entries(PEOPLE).forEach(([id, p]) => {
+    if (!p.parents || p.parents.length === 0) return;
+    const child = POS[id];
+    if (!child) return;
+    const cls = 'line-blood';
+
+    if (p.parents.length === 1) {
+      const par = POS[p.parents[0]];
+      if (!par) return;
+      const d = bloodPathD(par.x, par.y, child.x, child.y);
+      parts.push(`<path class="${cls}" data-child="${id}" data-parents="${p.parents.join(',')}" d="${d}"/>`);
+    } else {
+      const key = p.parents[0] + '|' + p.parents[1];
+      const anc = unionAnchors[key];
+      let originX, originY;
+      if (anc) {
+        originX = anc.x; originY = anc.y;
+      } else {
+        const a = POS[p.parents[0]], b = POS[p.parents[1]];
+        if (!a || !b) return;
+        originX = (a.x + b.x) / 2; originY = Math.max(a.y, b.y);
+      }
+      const d = bloodPathD(originX, originY, child.x, child.y);
+      parts.push(`<path class="${cls}" data-child="${id}" data-parents="${p.parents.join(',')}" d="${d}"/>`);
+    }
+  });
+
+  // 继嗣 / 兼祧 / 承统连线：与生身血缘完全独立的一组额外连线，恒为 line-special
+  // （亮金点线），不经过结合点，直接以 bloodPathD 连接"承统所出"与"入嗣之人"。
+  SUCCESSIONS.forEach(s => {
+    const from = POS[s.from], to = POS[s.to];
+    if (!from || !to) return;
+    const d = bloodPathD(from.x, from.y, to.x, to.y);
+    parts.push(`<path class="line-special" data-child="${s.to}" data-parents="${s.from}" d="${d}"/>`);
+  });
+
+  svg.innerHTML = parts.join('');
+}
+
+/* =========================================================
+   节点渲染
+   ========================================================= */
+
+const GENDER_SYMBOL = { m: '\u2642', f: '\u2640' }; // ♂ ♀
+const GENDER_WORD    = { m: '男', f: '女' };
+
+function nodeLabel(id) {
+  const p = PEOPLE[id];
+  const genderTxt = GENDER_WORD[p.gender] ? `，${GENDER_WORD[p.gender]}` : '';
+  return `${p.zh}，${p.gr}${genderTxt}，${p.role}`;
+}
+
+function genderBadgeHTML(p) {
+  const sym = GENDER_SYMBOL[p.gender];
+  if (!sym) return ''; // 'group' 或未标注性别的合并节点不显示符号
+  const cls = p.gender === 'm' ? 'male' : 'female';
+  return `<span class="gender-badge ${cls}" aria-hidden="true">${sym}</span>`;
+}
+
+function renderNodes() {
+  const layer = document.getElementById('nodes');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const html = [];
+
+  ROWS.forEach((row, gi) => {
+    row.forEach((entry, idx) => {
+      const id = Array.isArray(entry) ? entry[0] : entry;
+      const p = PEOPLE[id];
+      const pos = POS[id];
+      if (!p || !pos) return;
+      const emblem = EMBLEMS[p.emblem] || EMBLEMS.default;
+      const tierCls = p.tier && p.tier !== 'prince' ? ` tier-${p.tier}` : '';
+      const delay = reducedMotion ? '' : `style="left:${pos.x}px; top:${pos.y}px; animation-delay:${(gi * 0.12 + idx * 0.02).toFixed(2)}s"`;
+      const style = reducedMotion ? `style="left:${pos.x}px; top:${pos.y}px"` : delay;
+      const enterCls = reducedMotion ? '' : ' enter';
+
+      html.push(`
+        <button class="node${enterCls}" data-id="${id}" ${style} aria-label="${nodeLabel(id)}">
+          <span class="avatar${tierCls}">
+            <svg class="emblem" viewBox="0 0 40 40">${emblem}</svg>
+            ${genderBadgeHTML(p)}
+          </span>
+          <span class="node-name-zh">${p.zh}</span>
+          <span class="node-name-gr">${p.gr}</span>
+        </button>
+      `);
+    });
+  });
+
+  layer.innerHTML = html.join('');
+}
+
+/* =========================================================
+   交互：关联查找 / 高亮 / 提示框
+   ========================================================= */
+
+function relatedIds(id) {
+  const rel = new Set();
+  const p = PEOPLE[id];
+  (p.parents || []).forEach(pid => rel.add(pid));
+  UNIONS.forEach(u => {
+    if (u.a === id) rel.add(u.b);
+    if (u.b === id) rel.add(u.a);
+  });
+  Object.entries(PEOPLE).forEach(([cid, cp]) => {
+    if ((cp.parents || []).includes(id)) rel.add(cid);
+  });
+  SUCCESSIONS.forEach(s => {
+    if (s.from === id) rel.add(s.to);
+    if (s.to === id) rel.add(s.from);
+  });
+  return rel;
+}
+
+// 精确拆分版本：区分父/母/配偶/子女，供详情面板使用（relatedIds 仅用于高亮，不区分关系类型）
+function relationsOf(id) {
+  const p = PEOPLE[id];
+  const parents = (p.parents || []).map(pid => ({ id: pid, gender: PEOPLE[pid] ? PEOPLE[pid].gender : null }));
+  const spouses = [];
+  UNIONS.forEach(u => {
+    if (u.a === id) spouses.push(u.b);
+    else if (u.b === id) spouses.push(u.a);
+  });
+  const children = [];
+  Object.entries(PEOPLE).forEach(([cid, cp]) => {
+    if ((cp.parents || []).includes(id)) children.push(cid);
+  });
+  return { parents, spouses, children };
+}
+
+function parentNamesText(p) {
+  if (!p.parents || p.parents.length === 0) return '';
+  if (p.parents.length === 2) {
+    return `父母：${PEOPLE[p.parents[0]].zh}、${PEOPLE[p.parents[1]].zh}`;
+  }
+  if (p.special) {
+    return `诞生自：${PEOPLE[p.parents[0]].zh}`;
+  }
+  const parent = PEOPLE[p.parents[0]];
+  const tag = parent && parent.gender === 'f' ? '母' : (parent && parent.gender === 'm' ? '父' : '亲');
+  return `${tag}：${parent.zh}`;
+}
+
+function buildTooltip(id) {
+  const p = PEOPLE[id];
+  let html = `
+    <div class="tooltip-name"><span class="zh">${p.zh}</span><span class="gr">${p.gr}</span></div>
+    <div class="tooltip-role">${p.role}</div>
+  `;
+  const parentsText = parentNamesText(p);
+  if (parentsText) html += `<div class="tooltip-parents">${parentsText}</div>`;
+  if (p.special) html += `<div class="tooltip-special"><span class="mark">※</span> ${p.special}</div>`;
+  if (p.note) html += `<div class="tooltip-note">${p.note}</div>`;
+  return html;
+}
+
+let pinnedId = null;
+let longPressJustFired = false; // 触屏长按刚触发过详情面板时短暂置真，供 contextmenu 判断是否需要跳过，避免重复触发
+
+function applyHighlight(id) {
+  const rel = id ? relatedIds(id) : null;
+  const parentIds = id ? (PEOPLE[id].parents || []) : [];
+
+  document.querySelectorAll('.node').forEach(el => {
+    const nid = el.dataset.id;
+    el.classList.toggle('active', nid === id);
+    el.classList.toggle('dimmed', !!id && nid !== id && !rel.has(nid));
+    el.classList.toggle('parent-highlight', parentIds.includes(nid));
+  });
+
+  document.querySelectorAll('#connectors path, #connectors circle').forEach(el => {
+    if (!id) {
+      el.classList.remove('active', 'dimmed');
+      return;
+    }
+    const a = el.dataset.a, b = el.dataset.b;
+    const child = el.dataset.child, parents = el.dataset.parents ? el.dataset.parents.split(',') : null;
+    const isRelated = (a === id || b === id) || (child === id) || (parents && parents.includes(id));
+    el.classList.toggle('active', isRelated);
+    el.classList.toggle('dimmed', !isRelated);
+  });
+
+  updateFlowPaths(id);
+}
+
+/* ---------- 流光动效：单一父母一方发出 → 汇合点 → 选中头像，连续一体 ---------- */
+
+// 所有连线共用同一动画时长，确保无论连线长短，光流速度保持统一（稍慢的流速）
+const FLOW_DASH = 16, FLOW_GAP = 58;
+const FLOW_CYCLE = (FLOW_DASH + FLOW_GAP) * 10; // 740，动画每循环走过的偏移量
+const FLOW_SPEED_PX_S = 90; // px / 秒，统一且比先前更慢的流速
+const FLOW_DURATION = (FLOW_CYCLE / FLOW_SPEED_PX_S).toFixed(2) + 's';
+
+function computeAnchorForParents(pa, pb) {
+  const key1 = pa + '|' + pb, key2 = pb + '|' + pa;
+  if (UNION_ANCHORS[key1]) return UNION_ANCHORS[key1];
+  if (UNION_ANCHORS[key2]) return UNION_ANCHORS[key2];
+  const a = POS[pa], b = POS[pb];
+  if (!a || !b) return null;
+  return { x: (a.x + b.x) / 2, y: Math.max(a.y, b.y) };
+}
+
+// 构建从「父母双方」同时出发、经汇合点后再共同延伸到子代头像的完整路径（数组，单亲时只有一条）
+function buildParentChildFlowPaths(id) {
+  const p = PEOPLE[id];
+  const child = POS[id];
+  if (!p || !child || !p.parents || !p.parents.length) return [];
+
+  if (p.parents.length === 1) {
+    const par = POS[p.parents[0]];
+    if (!par) return [];
+    return [bloodPathD(par.x, par.y, child.x, child.y)];
+  }
+
+  // 双亲：父母双方同时作为起点，各自流向同一个汇合点，再无缝衔接到子代曲线
+  const anc = computeAnchorForParents(p.parents[0], p.parents[1]);
+  if (!anc) return [];
+
+  const y1 = anc.y + LABEL_CLEAR;
+  const bloodD = bloodPathD(anc.x, anc.y, child.x, child.y); // "M anc.x y1 C ..."
+  const seg2 = bloodD.replace(/^M/, 'L'); // 起点与汇合段终点完全重合，接续成同一条路径
+
+  return p.parents.map(parentId => {
+    const originPos = POS[parentId];
+    if (!originPos) return null;
+    const dx = anc.x - originPos.x, dy = anc.y - originPos.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const startX = originPos.x + (dx / dist) * AVATAR_R;
+    const startY = originPos.y + (dy / dist) * AVATAR_R;
+    const seg1 = `M ${startX} ${startY} L ${anc.x} ${anc.y} L ${anc.x} ${y1}`;
+    return seg1 + ' ' + seg2;
+  }).filter(Boolean);
+}
+
+function updateFlowPaths(id) {
+  const flowSvg = document.getElementById('flowLayer');
+  flowSvg.innerHTML = '';
+  if (!id) return;
+
+  const paths = buildParentChildFlowPaths(id);
+  if (!paths.length) return;
+
+  const isSpecial = !!PEOPLE[id].special;
+  const frag = document.createDocumentFragment();
+
+  paths.forEach(d => {
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.setAttribute('class', 'flow-path show');
+
+    const halo = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    halo.setAttribute('d', d);
+    halo.setAttribute('class', 'flow-halo');
+    halo.style.animationDuration = FLOW_DURATION;
+
+    const core = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    core.setAttribute('d', d);
+    core.setAttribute('class', 'flow-core');
+    core.style.animationDuration = FLOW_DURATION;
+    if (isSpecial) core.style.stroke = 'var(--gold2)';
+
+    group.appendChild(halo);
+    group.appendChild(core);
+    frag.appendChild(group);
+  });
+
+  flowSvg.appendChild(frag);
+}
+
+function positionTooltip(id) {
+  const tooltip = document.getElementById('tooltip');
+  const pos = POS[id];
+  tooltip.innerHTML = buildTooltip(id);
+  tooltip.classList.add('show');
+
+  let left = pos.x + 44;
+  let top = pos.y - 20;
+  const tw = 260;
+  if (left + tw > CANVAS_W - 20) left = pos.x - tw - 44;
+  if (top < 10) top = 10;
+
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').classList.remove('show');
+}
+
+/* =========================================================
+   详情面板（右键打开，展示比信息卡更完整的关系档案）
+   ========================================================= */
+
+const TIER_LABEL = {
+  emperor: '清朝皇帝',
+  consort: '皇后 / 皇太后 / 福晋',
+  minor:   '先世 · 序祖',
+};
+
+function kindLabelOf(p) {
+  if (TIER_LABEL[p.tier]) return TIER_LABEL[p.tier];
+  return p.gender === 'f' ? '女性宗室' : '男性宗室';
+}
+
+function relPersonRow(pid, tag) {
+  const rp = PEOPLE[pid];
+  if (!rp) return '';
+  return `<button class="detail-rel-item" data-goto="${pid}">
+    <span class="rel-tag">${tag}</span>
+    <span>${rp.zh}</span>
+    <span class="rel-role">${rp.role}</span>
+  </button>`;
+}
+
+// 将"详传"正文中出现的、本谱系中其他人物的姓名转换为可点击的跳转链接
+let MYTH_NAME_PATTERN = null;
+let MYTH_NAME_TO_ID = null;
+
+// 若未来新增的人物姓名恰好是本表中某人 zh 的前缀子串（例如新增一个以"载"或"胤"开头、
+// 但本身并非表中人物的专有名词），可将该词加入下表以避免被误判、只把前几个字错误链接到
+// 表中同前缀的宗室姓名。当前谱系的人物姓名彼此之间不存在此类前缀冲突，故暂为空。
+const MYTH_LINK_EXCLUDE_TERMS = [];
+
+function ensureMythNamePattern() {
+  if (MYTH_NAME_PATTERN) return;
+  const nameEntries = Object.entries(PEOPLE)
+    .filter(([, pp]) => pp.zh)
+    .map(([id, pp]) => ({ text: pp.zh, id }));
+  const excludeEntries = MYTH_LINK_EXCLUDE_TERMS.map(t => ({ text: t, id: null }));
+
+  const items = [...excludeEntries, ...nameEntries]
+    .sort((a, b) => b.text.length - a.text.length); // 长词优先匹配，避免被短名截断
+
+  MYTH_NAME_TO_ID = {};
+  items.forEach(({ text, id }) => {
+    if (!(text in MYTH_NAME_TO_ID)) MYTH_NAME_TO_ID[text] = id;
+  });
+
+  const escaped = items.map(({ text }) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  MYTH_NAME_PATTERN = new RegExp('(' + escaped.join('|') + ')', 'g');
+}
+
+function linkifyMyth(text, selfId) {
+  if (!text) return text;
+  ensureMythNamePattern();
+  return text.replace(MYTH_NAME_PATTERN, (m) => {
+    const targetId = MYTH_NAME_TO_ID[m];
+    if (!targetId || targetId === selfId) return m; // 排除词 / 自身姓名均不生成跳转
+    return `<span class="myth-link" data-goto="${targetId}" tabindex="0" role="button">${m}</span>`;
+  });
+}
+
+function buildDetailContent(id) {
+  const p = PEOPLE[id];
+  const { parents, spouses, children } = relationsOf(id);
+  const branchLabel = p.branch && BRANCH_META[p.branch] ? BRANCH_META[p.branch].label : '';
+  const kindLabel = kindLabelOf(p);
+
+  let html = '';
+  if (branchLabel) html += `<div class="detail-branch-tag">${branchLabel}</div>`;
+  html += `
+    <div class="detail-name" id="detailNameZh"><span class="zh">${p.zh}</span><span class="gr">${p.gr}</span></div>
+    <div class="detail-role">${p.role}</div>
+    <div class="detail-kind">${kindLabel}</div>
+    ${p.roman ? `<div class="detail-roman">生卒 / 在位 · <span class="roman-name">${p.roman}</span></div>` : ''}
+  `;
+
+  // 典故：放在最前，作为进入这个人物时最先读到的"故事"内容
+  if (p.myth) {
+    html += `<div class="detail-section"><div class="detail-myth-title">典故</div>
+      <div class="detail-myth">${linkifyMyth(p.myth, id)}</div></div>`;
+  }
+
+  // 父母：区分父/母；单亲或非常规诞生时给出对应措辞
+  html += `<div class="detail-section"><div class="detail-section-title">父母</div>`;
+  if (parents.length === 0) {
+    html += `<div class="detail-empty">先世更早的祖辈未纳入本谱系</div>`;
+  } else if (parents.length === 2) {
+    const tags = parents.map(pp => pp.gender === 'm' ? '父' : pp.gender === 'f' ? '母' : '亲');
+    html += `<div class="detail-rel-list">${parents.map((pp, i) => relPersonRow(pp.id, tags[i])).join('')}</div>`;
+  } else {
+    const tag = p.special ? '诞生自' : (parents[0].gender === 'm' ? '父' : parents[0].gender === 'f' ? '母' : '亲');
+    html += `<div class="detail-rel-list">${relPersonRow(parents[0].id, tag)}</div>`;
+  }
+  html += `</div>`;
+
+  // 配偶/结合对象
+  html += `<div class="detail-section"><div class="detail-section-title">配偶</div>`;
+  html += spouses.length
+    ? `<div class="detail-rel-list">${spouses.map(sid => relPersonRow(sid, '偶')).join('')}</div>`
+    : `<div class="detail-empty">暂无记录</div>`;
+  html += `</div>`;
+
+  // 子女
+  html += `<div class="detail-section"><div class="detail-section-title">子女（共 ${children.length} 位）</div>`;
+  html += children.length
+    ? `<div class="detail-rel-list">${children.map(cid => {
+        const cg = PEOPLE[cid].gender;
+        const tag = cg === 'f' ? '女' : cg === 'm' ? '子' : '嗣';
+        return relPersonRow(cid, tag);
+      }).join('')}</div>`
+    : `<div class="detail-empty">暂无记录</div>`;
+  html += `</div>`;
+
+  if (p.special) {
+    html += `<div class="detail-section"><div class="detail-section-title">继嗣 / 兼祧说明</div>
+      <div class="detail-special"><span class="mark">※</span> ${p.special}</div></div>`;
+  }
+  if (p.note) {
+    html += `<div class="detail-section"><div class="detail-section-title">补充说明</div>
+      <div class="detail-note-text">${p.note}</div></div>`;
+  }
+
+  return html;
+}
+
+function openDetailPanel(id) {
+  const overlay = document.getElementById('detailOverlay');
+  document.getElementById('detailContent').innerHTML = buildDetailContent(id);
+  document.getElementById('detailPanel').scrollTop = 0;
+  overlay.classList.add('show');
+  // 下一帧再加 'in'，让 opacity/translateY 过渡生效
+  requestAnimationFrame(() => overlay.classList.add('in'));
+}
+
+function closeDetailPanel() {
+  const overlay = document.getElementById('detailOverlay');
+  overlay.classList.remove('in');
+  setTimeout(() => overlay.classList.remove('show'), 220);
+}
+
+function initDetailPanel() {
+  const overlay = document.getElementById('detailOverlay');
+  const layer = document.getElementById('nodes');
+
+  // 阻止长按选中文字：selectstart 是浏览器文本选择动作的真正起点事件，
+  // 在这里 preventDefault 才能真正阻止选中发生（contextmenu 触发时选中往往已经完成）
+  layer.addEventListener('selectstart', e => {
+    if (e.target.closest('.node')) e.preventDefault();
+  });
+
+  layer.addEventListener('contextmenu', e => {
+    // 触屏端的等效手势已由下方 pointerdown 长按计时器处理并刚刚触发过，
+    // 此处跳过，避免二者在触屏上同时触发 openDetailPanel
+    if (longPressJustFired) { e.preventDefault(); return; }
+    const btn = e.target.closest('.node');
+    if (!btn) return;
+    e.preventDefault();
+    hideTooltip();
+    openDetailPanel(btn.dataset.id);
+  });
+
+  document.getElementById('detailClose').addEventListener('click', closeDetailPanel);
+
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeDetailPanel();
+  });
+
+  document.getElementById('detailContent').addEventListener('click', e => {
+    const btn = e.target.closest('[data-goto]');
+    if (!btn) return;
+    const targetId = btn.dataset.goto;
+    closeDetailPanel();
+    setTimeout(() => openDetailPanel(targetId), 230);
+  });
+
+  document.getElementById('detailContent').addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const btn = e.target.closest('.myth-link[data-goto]');
+    if (!btn) return;
+    e.preventDefault();
+    btn.click();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.classList.contains('show')) {
+      closeDetailPanel();
+    }
+  });
+}
+
+function initInteractions() {
+  const layer = document.getElementById('nodes');
+
+  // 悬浮显示信息卡的行为与“单击固定关联高亮”彻底解耦：
+  // 不论当前是否已有节点被 pin，鼠标移到任意头像上都应显示该人物的信息卡；
+  // 只有“关联高亮”这一视觉效果在存在 pin 时保持锁定在被 pin 的节点上。
+  layer.addEventListener('pointerover', e => {
+    const btn = e.target.closest('.node');
+    if (!btn) return;
+    positionTooltip(btn.dataset.id);
+    if (pinnedId) return;
+    applyHighlight(btn.dataset.id);
+  });
+
+  layer.addEventListener('pointerout', e => {
+    const btn = e.target.closest('.node');
+    if (!btn) return;
+    hideTooltip();
+    if (pinnedId) return;
+    applyHighlight(null);
+  });
+
+  layer.addEventListener('focusin', e => {
+    const btn = e.target.closest('.node');
+    if (!btn) return;
+    positionTooltip(btn.dataset.id);
+    if (pinnedId) return;
+    applyHighlight(btn.dataset.id);
+  });
+
+  layer.addEventListener('focusout', e => {
+    const btn = e.target.closest('.node');
+    if (!btn) return;
+    hideTooltip();
+    if (pinnedId) return;
+    applyHighlight(null);
+  });
+
+  // 单击：仅切换“固定关联高亮”，不再弹出信息卡（避免遮挡关系图）。
+  // 右键（contextmenu）打开详情面板、悬浮显示信息卡的行为均不受影响。
+  layer.addEventListener('click', e => {
+    const btn = e.target.closest('.node');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    if (pinnedId === id) {
+      pinnedId = null;
+      applyHighlight(null);
+    } else {
+      pinnedId = id;
+      applyHighlight(id);
+    }
+    hideTooltip();
+  });
+
+  layer.addEventListener('dblclick', e => {
+    const btn = e.target.closest('.node');
+    if (!btn) return;
+    e.preventDefault();
+    focusOnSubtree(btn.dataset.id);
+  });
+
+  // 长按呼出详情面板：桌面端已有右键(contextmenu)，但触屏设备的 contextmenu
+  // 触发时机因浏览器而异、不可靠，因此显式实现一套长按检测作为触屏端的等效手势。
+  //
+  // 关键设计：达到长按阈值时只做标记 + 震动反馈，并不立即弹出面板；
+  // 面板改为等手指真正抬起(pointerup)时才打开。这样面板出现的那一刻手指已经
+  // 离开屏幕，物理上不存在"手指仍停留在刚渲染出的正文文字上，被系统重新
+  // 识别为一次新的长按选中"的可能——比事后用遮罩/CSS 拦截更彻底。
+  let longPressTimer = null;
+  let longPressStartX = 0, longPressStartY = 0;
+  let longPressFired = false;   // 已达到长按阈值，等待手指抬起后打开面板
+  let longPressOpenedId = null; // 达到阈值时记录目标节点 id
+  const LONG_PRESS_MS = 650;    // 适当延长，减少与系统长按选择判定窗口重叠的概率
+  const LONG_PRESS_MOVE_TOLERANCE = 10;
+
+  layer.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse') return; // 鼠标已有右键路径，长按只服务触屏/触控笔
+    const btn = e.target.closest('.node');
+    if (!btn) return;
+    // 阻止移动端浏览器原生的长按选中文字/系统菜单(复制/粘贴/分享)
+    e.preventDefault();
+    longPressFired = false;
+    longPressOpenedId = null;
+    longPressStartX = e.clientX;
+    longPressStartY = e.clientY;
+
+    longPressTimer = setTimeout(() => {
+      longPressFired = true;
+      longPressOpenedId = btn.dataset.id;
+      if (navigator.vibrate) navigator.vibrate(12); // 达到阈值时先给触觉反馈，提示"松手即可查看详情"
+    }, LONG_PRESS_MS);
+  }, { passive: false });
+
+  function cancelLongPress() {
+    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+  }
+
+  layer.addEventListener('pointermove', e => {
+    if (!longPressTimer) return;
+    const dx = Math.abs(e.clientX - longPressStartX), dy = Math.abs(e.clientY - longPressStartY);
+    if (dx > LONG_PRESS_MOVE_TOLERANCE || dy > LONG_PRESS_MOVE_TOLERANCE) cancelLongPress();
+  });
+
+  layer.addEventListener('pointerup', () => {
+    cancelLongPress();
+    // 手指此刻已抬起，面板打开时不会再有触摸残留在正文上
+    if (longPressFired && longPressOpenedId) {
+      hideTooltip();
+      openDetailPanel(longPressOpenedId);
+      longPressJustFired = true;
+      setTimeout(() => { longPressJustFired = false; }, 600);
+    }
+    longPressOpenedId = null;
+  });
+  layer.addEventListener('pointercancel', () => { cancelLongPress(); longPressFired = false; longPressOpenedId = null; });
+
+  // 长按已经触发详情面板时，同一次触摸抬起不应再被 click 处理器当作一次普通点击
+  // （否则会在关闭详情面板的同时又切换一次 pin 高亮状态，产生错乱）。
+  layer.addEventListener('click', e => {
+    if (longPressFired) { longPressFired = false; e.stopPropagation(); }
+  }, true);
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && pinnedId) {
+      pinnedId = null;
+      applyHighlight(null);
+      hideTooltip();
+    }
+  });
+}
+
+/* =========================================================
+   统计信息
+   ========================================================= */
+
+function renderStats() {
+  const peopleCount = Object.keys(PEOPLE).length;
+  const genCount = ROWS.length;
+  const unionCount = UNIONS.length;
+  const successionCount = SUCCESSIONS.length;
+  document.getElementById('stats').innerHTML =
+    `<b>${peopleCount}</b> 位人物　·　<b>${genCount}</b> 代世系　·　<b>${unionCount}</b> 段婚姻　·　<b>${successionCount}</b> 段兼祧`;
+}
+
+/* =========================================================
+   初始化
+   ========================================================= */
+
+/* =========================================================
+   平移 / 缩放
+   ========================================================= */
+
+// maxScale 从 2.5 收窄到 1.8：transform: scale() 缩放文字与 emblem 图标时，
+// 浏览器多走 GPU 合成层插值而非重新栅格化字形，倍数越高越容易出现"越放大越模糊"
+// 的观感。配合本轮同步提高的基础字号（14→15px 等），1.8 倍已能看清所有细节，
+// 且仍落在插值失真尚不明显的区间内。
+const view = { scale: 1, x: 0, y: 0, minScale: 0.25, maxScale: 1.8 };
+
+function applyView() {
+  const canvas = document.getElementById('canvas');
+  canvas.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`;
+  const tooltip = document.getElementById('tooltip');
+  tooltip.style.transform = `scale(${1 / view.scale})`;
+  const resetBtn = document.getElementById('zoomReset');
+  if (resetBtn) resetBtn.textContent = Math.round(view.scale * 100) + '%';
+  updateMinimapViewport();
+}
+
+function fitToViewport() {
+  const viewport = document.getElementById('viewport');
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const scale = Math.min(1, Math.min((vw - 60) / CANVAS_W, (vh - 60) / CANVAS_H));
+  view.scale = Math.max(view.minScale, Math.min(view.maxScale, scale));
+  view.x = (vw - CANVAS_W * view.scale) / 2;
+  view.y = (vh - CANVAS_H * view.scale) / 2;
+  applyView();
+}
+
+// DEFAULT_FOCUS_IDS 定义页面首次打开时聚焦的核心区域：晚清"三支分叉＋兼祧"一带——
+// 咸丰、恭亲王奕訢、醇亲王奕譞三兄弟的分支，以及同治、光绪、摄政王载沣、宣统溥仪。
+// 这组人物彼此紧邻（跨3个相邻世代行），恰好完整呈现本谱系最关键的设计点：
+// 亮金点线所示的"继嗣与兼祧"关系（咸丰→光绪、同治→溥仪、光绪→溥仪），
+// 相比"整体缩略全览"（fitToViewport，文字会小到不可读）更适合作为初次进入时的视图。
+const DEFAULT_FOCUS_IDS = ['yizhu', 'yixin', 'yixuan', 'zaichun', 'zaitian', 'zaifeng', 'puyi'];
+
+function focusDefaultView() {
+  const ids = DEFAULT_FOCUS_IDS.filter(id => POS[id]);
+  if (ids.length === 0) { fitToViewport(); return; }
+
+  const xs = ids.map(id => POS[id].x);
+  const ys = ids.map(id => POS[id].y);
+  const minX = Math.min(...xs) - 100, maxX = Math.max(...xs) + 100;
+  const minY = Math.min(...ys) - 90, maxY = Math.max(...ys) + 110;
+  const boxW = maxX - minX, boxH = maxY - minY;
+
+  const viewport = document.getElementById('viewport');
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const padding = 70;
+
+  // 默认视图的缩放上限刻意比手动可缩放的 view.maxScale(1.8) 更保守(1.25)：
+  // 这是“页面刚打开、用户还没做任何操作”时看到的第一屏，克制一些更显自然，
+  // 避免宽屏下自动算出的贴合缩放把头像放大到失真的程度。
+  const DEFAULT_VIEW_MAX_SCALE = 1.25;
+  // 清晰度下限：无论视口多窄，默认视图的缩放都不应低于此值，否则头像/文字会跌回
+  // 不可读的区间（参见本次改动前的诊断：0.25 缩放下头像仅 16px、文字仅 5px 高）。
+  // 换算下来 0.85 缩放对应头像约 54px、中文名约 21px，是清晰与否的实际分界点。
+  const CLARITY_MIN_SCALE = 0.85;
+
+  const fitScale = Math.min((vw - padding * 2) / boxW, (vh - padding * 2) / boxH);
+  const scale = fitScale >= CLARITY_MIN_SCALE
+    ? Math.min(DEFAULT_VIEW_MAX_SCALE, fitScale)
+    : CLARITY_MIN_SCALE; // 视口装不下完整目标组时，宁可裁切也要保证清晰度，不再退让
+
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  view.scale = Math.max(view.minScale, scale);
+  view.x = vw / 2 - cx * view.scale;
+  view.y = vh * 0.45 - cy * view.scale;
+  applyView();
+}
+
+function zoomAt(factor, cx, cy) {
+  const viewport = document.getElementById('viewport');
+  const rect = viewport.getBoundingClientRect();
+  const px = cx !== undefined ? cx - rect.left : viewport.clientWidth / 2;
+  const py = cy !== undefined ? cy - rect.top : viewport.clientHeight / 2;
+
+  const newScale = Math.max(view.minScale, Math.min(view.maxScale, view.scale * factor));
+  const ratio = newScale / view.scale;
+
+  // 保持鼠标/中心点在缩放前后指向画布上的同一坐标
+  view.x = px - (px - view.x) * ratio;
+  view.y = py - (py - view.y) * ratio;
+  view.scale = newScale;
+  applyView();
+}
+
+/* =========================================================
+   小地图 (Minimap)
+   ========================================================= */
+
+const MINIMAP_W = 190;
+const MINIMAP_H = 120;
+let minimapScale = 1;
+let minimapReady = false;
+
+function drawMinimap() {
+  const canvas = document.getElementById('minimapCanvas');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+
+  minimapScale = Math.min(MINIMAP_W / CANVAS_W, MINIMAP_H / CANVAS_H);
+  const mw = CANVAS_W * minimapScale;
+  const mh = CANVAS_H * minimapScale;
+
+  canvas.width = mw * dpr;
+  canvas.height = mh * dpr;
+  canvas.style.width = mw + 'px';
+  canvas.style.height = mh + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, mw, mh);
+
+  // 背景
+  ctx.fillStyle = 'rgba(255,255,255,0.02)';
+  ctx.fillRect(0, 0, mw, mh);
+
+  // 结合/血缘连线（简化为极细线，仅示意走向）
+  ctx.strokeStyle = 'rgba(201,166,110,0.35)';
+  ctx.lineWidth = 0.5;
+  UNIONS.forEach(u => {
+    const a = POS[u.a], b = POS[u.b];
+    if (!a || !b) return;
+    ctx.beginPath();
+    ctx.moveTo(a.x * minimapScale, a.y * minimapScale);
+    ctx.lineTo(b.x * minimapScale, b.y * minimapScale);
+    ctx.stroke();
+  });
+  Object.entries(PEOPLE).forEach(([id, p]) => {
+    if (!p.parents || p.parents.length === 0) return;
+    const child = POS[id];
+    if (!child) return;
+    p.parents.forEach(pid => {
+      const par = POS[pid];
+      if (!par) return;
+      ctx.beginPath();
+      ctx.moveTo(par.x * minimapScale, par.y * minimapScale);
+      ctx.lineTo(child.x * minimapScale, child.y * minimapScale);
+      ctx.stroke();
+    });
+  });
+
+  // 节点：帝王在小地图上用略大、更亮的点，呼应主画布的头像尺寸档位
+  Object.entries(POS).forEach(([id, pos]) => {
+    const p = PEOPLE[id];
+    const isEmperor = p.tier === 'emperor';
+    ctx.beginPath();
+    ctx.arc(pos.x * minimapScale, pos.y * minimapScale, isEmperor ? 1.9 : 1.4, 0, Math.PI * 2);
+    ctx.fillStyle = isEmperor ? 'rgba(232,201,126,0.95)' : 'rgba(232,201,126,0.7)';
+    ctx.fill();
+  });
+
+  minimapReady = true;
+  updateMinimapViewport();
+}
+
+function updateMinimapViewport() {
+  if (!minimapReady) return;
+  const box = document.getElementById('minimapViewport');
+  const viewport = document.getElementById('viewport');
+  if (!box || !viewport) return;
+
+  // 移动端 minimap 整体隐藏(display:none)时，读取 clientWidth 仍会强制触发布局回流，
+  // 在高频 pointermove 拖拽中就是卡顿/跳动的根源，此处直接跳过
+  const minimapEl = document.getElementById('minimap') || box.closest('.minimap');
+  if (minimapEl && minimapEl.offsetParent === null) return;
+
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+
+  // 视口在画布坐标系中的可见范围 -> 换算到 minimap 像素坐标
+  const visX = -view.x / view.scale;
+  const visY = -view.y / view.scale;
+  const visW = vw / view.scale;
+  const visH = vh / view.scale;
+
+  box.style.left = Math.max(0, visX * minimapScale) + 'px';
+  box.style.top = Math.max(0, visY * minimapScale) + 'px';
+  box.style.width = Math.min(MINIMAP_W, visW * minimapScale) + 'px';
+  box.style.height = Math.min(MINIMAP_H, visH * minimapScale) + 'px';
+}
+
+function minimapToCanvasXY(clientX, clientY) {
+  const canvas = document.getElementById('minimapCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const mx = clientX - rect.left;
+  const my = clientY - rect.top;
+  return { x: mx / minimapScale, y: my / minimapScale };
+}
+
+function centerViewOnCanvasXY(cx, cy) {
+  const viewport = document.getElementById('viewport');
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  view.x = vw / 2 - cx * view.scale;
+  view.y = vh / 2 - cy * view.scale;
+  applyView();
+}
+
+function initMinimap() {
+  drawMinimap();
+  const canvas = document.getElementById('minimapCanvas');
+  let dragging = false;
+
+  function jumpTo(e) {
+    const { x, y } = minimapToCanvasXY(e.clientX, e.clientY);
+    centerViewOnCanvasXY(x, y);
+  }
+
+  canvas.addEventListener('pointerdown', e => {
+    dragging = true;
+    canvas.setPointerCapture(e.pointerId);
+    jumpTo(e);
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (dragging) jumpTo(e);
+  });
+  canvas.addEventListener('pointerup', () => { dragging = false; });
+  canvas.addEventListener('pointercancel', () => { dragging = false; });
+
+  window.addEventListener('resize', () => updateMinimapViewport());
+}
+
+function initFootNoteToggle() {
+  const toggle = document.getElementById('footNoteToggle');
+  const full = document.getElementById('footNoteFull');
+  if (!toggle || !full) return;
+
+  toggle.addEventListener('click', () => {
+    const expanded = full.classList.toggle('expanded');
+    toggle.setAttribute('aria-expanded', String(expanded));
+  });
+}
+
+function initHeaderToggle() {
+  const topbar = document.getElementById('topbar');
+  const toggle = document.getElementById('headerToggle');
+  const body = document.getElementById('headerBody');
+
+  // 移动端默认收起表头，节省小屏空间；与 CSS 的 720px 断点保持一致
+  if (window.matchMedia('(max-width: 720px)').matches) {
+    topbar.classList.add('collapsed');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', '展开表头');
+  }
+
+  toggle.addEventListener('click', () => {
+    const collapsed = topbar.classList.toggle('collapsed');
+    toggle.setAttribute('aria-expanded', String(!collapsed));
+    toggle.setAttribute('aria-label', collapsed ? '展开表头' : '收起表头');
+  });
+
+  // 折叠/展开动画期间画布可视区域尺寸在变化，动画结束后校正小地图视口框；
+  // 过程中也持续校正一次，让指示框的收缩/展开观感更跟手。
+  body.addEventListener('transitionend', e => {
+    if (e.propertyName === 'grid-template-rows') updateMinimapViewport();
+  });
+  let rafId = null;
+  toggle.addEventListener('click', () => {
+    const start = performance.now();
+    function tick(now) {
+      updateMinimapViewport();
+      if (now - start < 340) rafId = requestAnimationFrame(tick);
+    }
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(tick);
+  });
+}
+
+function initPanZoom() {
+  const viewport = document.getElementById('viewport');
+  let dragging = false;
+  let dragMoved = false;
+  let startX = 0, startY = 0, startViewX = 0, startViewY = 0;
+  let activePointerId = null;
+  let pendingMove = null;
+  let rafId = null;
+
+  // 多指追踪：pointerId -> {x, y}，用于双指缩放(pinch-zoom)
+  const activePointers = new Map();
+  let pinching = false;
+  let pinchStartDist = 0;
+  let pinchStartScale = 1;
+  let pinchMidX = 0, pinchMidY = 0;
+
+  function distance(p1, p2) {
+    return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+  }
+  function midpoint(p1, p2) {
+    return { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+  }
+
+  function cancelSingleDrag() {
+    dragging = false;
+    activePointerId = null;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    pendingMove = null;
+    viewport.classList.remove('grabbing');
+  }
+
+  viewport.addEventListener('pointerdown', e => {
+    if (e.target.closest('.node') || e.target.closest('.zoom-controls')) return;
+
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    viewport.setPointerCapture(e.pointerId);
+
+    if (activePointers.size === 2) {
+      // 第二指落下：切换到双指缩放模式，取消单指拖拽状态避免二者打架导致画面跳动
+      cancelSingleDrag();
+      const [p1, p2] = [...activePointers.values()];
+      pinching = true;
+      pinchStartDist = distance(p1, p2);
+      pinchStartScale = view.scale;
+      const mid = midpoint(p1, p2);
+      pinchMidX = mid.x; pinchMidY = mid.y;
+      return;
+    }
+
+    if (activePointers.size > 2) return; // 三指及以上不处理
+
+    // 单指：忽略非主指针，避免多点触控时触发跳变
+    if (activePointerId !== null) return;
+    if (!e.isPrimary) return;
+    activePointerId = e.pointerId;
+    dragging = true;
+    dragMoved = false;
+    startX = e.clientX; startY = e.clientY;
+    startViewX = view.x; startViewY = view.y;
+    viewport.classList.add('grabbing');
+  });
+
+  viewport.addEventListener('pointermove', e => {
+    if (!activePointers.has(e.pointerId)) return;
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pinching && activePointers.size === 2) {
+      const [p1, p2] = [...activePointers.values()];
+      const dist = distance(p1, p2);
+      if (pinchStartDist > 0) {
+        const factor = (dist / pinchStartDist) * (pinchStartScale / view.scale);
+        const mid = midpoint(p1, p2);
+        zoomAt(factor, mid.x, mid.y);
+      }
+      return;
+    }
+
+    if (!dragging || e.pointerId !== activePointerId) return;
+    pendingMove = e;
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      if (!pendingMove || !dragging) return;
+      const dx = pendingMove.clientX - startX, dy = pendingMove.clientY - startY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragMoved = true;
+      view.x = startViewX + dx;
+      view.y = startViewY + dy;
+      applyView();
+      pendingMove = null;
+    });
+  });
+
+  function endDrag(e) {
+    activePointers.delete(e.pointerId);
+
+    if (pinching) {
+      if (activePointers.size < 2) {
+        pinching = false;
+        // 若还剩一指，不自动转为拖拽，等待该指抬起后重新按下，避免锚点跳变
+      }
+      return;
+    }
+
+    if (!dragging || e.pointerId !== activePointerId) return;
+    dragging = false;
+    activePointerId = null;
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    pendingMove = null;
+    viewport.classList.remove('grabbing');
+    // 纯点击（未拖动）且点在空白处 → 取消高亮/固定
+    if (!dragMoved && e.target === viewport) {
+      pinnedId = null;
+      applyHighlight(null);
+      hideTooltip();
+    }
+  }
+  viewport.addEventListener('pointerup', endDrag);
+  viewport.addEventListener('pointercancel', endDrag);
+
+  viewport.addEventListener('wheel', e => {
+    e.preventDefault();
+    const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+    zoomAt(factor, e.clientX, e.clientY);
+  }, { passive: false });
+
+  document.getElementById('zoomIn').addEventListener('click', () => zoomAt(1.25));
+  document.getElementById('zoomOut').addEventListener('click', () => zoomAt(1 / 1.25));
+  document.getElementById('zoomReset').addEventListener('click', () => focusDefaultView());
+
+  window.addEventListener('resize', () => focusDefaultView());
+}
+
+/* =========================================================
+   搜索定位
+   ========================================================= */
+
+// 拼音首字母/全拼简易映射（仅覆盖本谱系用到的常见字，用于中文名搜索时的容错，
+// 主要搜索匹配仍以 zh/gr 子串命中为主，这里只做首字母加分辅助排序）
+function normalizeQuery(q) {
+  return q.trim().toLowerCase();
+}
+
+function searchPeople(query) {
+  const q = normalizeQuery(query);
+  if (!q) return [];
+  const results = [];
+  Object.entries(PEOPLE).forEach(([id, p]) => {
+    const zh = p.zh.toLowerCase();
+    const gr = p.gr.toLowerCase();
+    const role = (p.role || '').toLowerCase();
+    let score = -1;
+    if (zh.startsWith(q) || gr.startsWith(q)) score = 3;
+    else if (zh.includes(q) || gr.includes(q)) score = 2;
+    else if (role.includes(q)) score = 1;
+    if (score > 0) results.push({ id, score });
+  });
+  results.sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
+  return results.slice(0, 12).map(r => r.id);
+}
+
+function renderSearchResults(ids, query) {
+  const box = document.getElementById('searchResults');
+  if (!query.trim()) {
+    box.classList.remove('show');
+    box.innerHTML = '';
+    return;
+  }
+  if (ids.length === 0) {
+    box.innerHTML = `<div class="search-empty">未找到与"${query}"匹配的人物</div>`;
+    box.classList.add('show');
+    return;
+  }
+  box.innerHTML = ids.map((id, i) => {
+    const p = PEOPLE[id];
+    return `<div class="search-result-item${i === 0 ? ' kb-active' : ''}" data-id="${id}" role="option">
+      <span class="search-result-zh">${p.zh}</span>
+      <span class="search-result-role">${p.role}</span>
+    </div>`;
+  }).join('');
+  box.classList.add('show');
+}
+
+// 聚焦到指定节点：平滑移动视图使其居中，并 pin 高亮
+function focusOnNode(id, opts) {
+  const pos = POS[id];
+  if (!pos) return;
+  const targetScale = (opts && opts.scale) || Math.max(view.scale, 0.85);
+  const viewport = document.getElementById('viewport');
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+
+  view.scale = Math.max(view.minScale, Math.min(view.maxScale, targetScale));
+  view.x = vw / 2 - pos.x * view.scale;
+  // 略偏上半区居中（而非正中）：节点信息卡/tooltip 通常向下展开，
+  // 留更多下方空间比上方空间更实用，同时避免节点紧贴视口顶边。
+  view.y = vh * 0.42 - pos.y * view.scale;
+  applyView();
+
+  pinnedId = id;
+  applyHighlight(id);
+  positionTooltip(id);
+}
+
+// 双击一个节点：缩放并居中到"该节点 + 其父母/配偶/子女"的外接范围，
+// 让人一眼看清这一小片家族关系，而不必手动缩放定位。
+function focusOnSubtree(id) {
+  const pos = POS[id];
+  if (!pos) return;
+  const rel = relatedIds(id);
+  const ids = [id, ...rel].filter(rid => POS[rid]);
+  if (ids.length === 0) return;
+
+  const xs = ids.map(rid => POS[rid].x);
+  const ys = ids.map(rid => POS[rid].y);
+  const minX = Math.min(...xs) - 90, maxX = Math.max(...xs) + 90;
+  const minY = Math.min(...ys) - 70, maxY = Math.max(...ys) + 90;
+  const boxW = maxX - minX, boxH = maxY - minY;
+
+  const viewport = document.getElementById('viewport');
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const padding = 80;
+  const scale = Math.min(
+    view.maxScale,
+    Math.max(view.minScale, Math.min((vw - padding * 2) / boxW, (vh - padding * 2) / boxH))
+  );
+
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  view.scale = scale;
+  view.x = vw / 2 - cx * scale;
+  view.y = vh * 0.45 - cy * scale;
+  applyView();
+
+  pinnedId = id;
+  applyHighlight(id);
+  positionTooltip(id);
+}
+
+function initSearch() {
+  const input = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('searchClear');
+  const box = document.getElementById('searchResults');
+  let activeIndex = 0;
+  let currentIds = [];
+
+  function runSearch() {
+    const q = input.value;
+    clearBtn.classList.toggle('show', q.length > 0);
+    currentIds = searchPeople(q);
+    activeIndex = 0;
+    renderSearchResults(currentIds, q);
+  }
+
+  input.addEventListener('input', runSearch);
+
+  input.addEventListener('focus', () => {
+    if (input.value.trim()) renderSearchResults(currentIds, input.value);
+  });
+
+  input.addEventListener('keydown', e => {
+    if (!box.classList.contains('show') || currentIds.length === 0) {
+      if (e.key === 'Escape') { input.blur(); }
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIndex = Math.min(activeIndex + 1, currentIds.length - 1);
+      updateActiveItem();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIndex = Math.max(activeIndex - 1, 0);
+      updateActiveItem();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const id = currentIds[activeIndex];
+      if (id) selectSearchResult(id);
+    } else if (e.key === 'Escape') {
+      box.classList.remove('show');
+      input.blur();
+    }
+  });
+
+  function updateActiveItem() {
+    box.querySelectorAll('.search-result-item').forEach((el, i) => {
+      el.classList.toggle('kb-active', i === activeIndex);
+    });
+    const activeEl = box.querySelector('.kb-active');
+    if (activeEl) activeEl.scrollIntoView({ block: 'nearest' });
+  }
+
+  function selectSearchResult(id) {
+    focusOnNode(id);
+    box.classList.remove('show');
+    input.value = PEOPLE[id].zh;
+    clearBtn.classList.add('show');
+  }
+
+  box.addEventListener('click', e => {
+    const item = e.target.closest('.search-result-item');
+    if (!item) return;
+    selectSearchResult(item.dataset.id);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    input.value = '';
+    clearBtn.classList.remove('show');
+    box.classList.remove('show');
+    box.innerHTML = '';
+    input.focus();
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.search-wrap')) {
+      box.classList.remove('show');
+    }
+  });
+}
+
+/* =========================================================
+   分支筛选
+   ========================================================= */
+
+const BRANCH_META = {
+  imperial_line: { label: '皇位承统' },
+  early_princes: { label: '清初宗王' },
+  kangxi_sons:   { label: '康熙诸子' },
+  qianlong_sons: { label: '乾隆诸子' },
+  chunwangfu:    { label: '晚清醇王府' },
+  gongwangfu:    { label: '晚清恭王府' },
+  consorts:      { label: '后妃与皇太后' },
+  succession:    { label: '继嗣与兼祧' }
+};
+
+let activeBranch = null; // null = 显示全部
+
+function renderBranchFilter() {
+  const box = document.getElementById('branchFilter');
+  const counts = {};
+  // 每位人物可同时归属多个分支标签（p.branches 为数组），故按标签逐一计数，
+  // 而非像单分支模型那样每人只计入一个分类。
+  Object.values(PEOPLE).forEach(p => {
+    (p.branches || []).forEach(b => { counts[b] = (counts[b] || 0) + 1; });
+  });
+  const allBtn = `<button class="branch-btn active" data-branch="" type="button">全部谱系 · ${Object.keys(PEOPLE).length}</button>`;
+  const branchBtns = Object.entries(BRANCH_META).map(([key, meta]) =>
+    `<button class="branch-btn" data-branch="${key}" type="button">${meta.label} · ${counts[key] || 0}</button>`
+  ).join('');
+  box.innerHTML = allBtn + branchBtns;
+}
+
+function applyBranchFilter(branch) {
+  activeBranch = branch || null;
+
+  document.querySelectorAll('.branch-btn').forEach(btn => {
+    btn.classList.toggle('active', (btn.dataset.branch || null) === activeBranch);
+  });
+
+  document.querySelectorAll('.node').forEach(el => {
+    const id = el.dataset.id;
+    const p = PEOPLE[id];
+    const hidden = activeBranch && !(p.branches || []).includes(activeBranch);
+    el.classList.toggle('branch-hidden', !!hidden);
+  });
+
+  document.querySelectorAll('#connectors path, #connectors circle').forEach(el => {
+    if (!activeBranch) { el.classList.remove('branch-hidden'); return; }
+    const a = el.dataset.a, b = el.dataset.b;
+    const child = el.dataset.child;
+    const parents = el.dataset.parents ? el.dataset.parents.split(',') : null;
+    const relevantIds = [a, b, child, ...(parents || [])].filter(Boolean);
+    const allInBranch = relevantIds.length > 0 && relevantIds.every(id => PEOPLE[id] && (PEOPLE[id].branches || []).includes(activeBranch));
+    el.classList.toggle('branch-hidden', !allInBranch);
+  });
+
+  // 切换分支时清除单点高亮/固定状态，避免两套 dimmed 逻辑叠加造成困惑
+  pinnedId = null;
+  applyHighlight(null);
+  hideTooltip();
+}
+
+function initBranchFilter() {
+  renderBranchFilter();
+  const box = document.getElementById('branchFilter');
+  box.addEventListener('click', e => {
+    const btn = e.target.closest('.branch-btn');
+    if (!btn) return;
+    applyBranchFilter(btn.dataset.branch);
+  });
+}
+
+/* =========================================================
+   图例可点击筛选（按连线/节点类型）
+   ========================================================= */
+
+let activeLineFilter = null;
+
+function applyLineFilter(type) {
+  activeLineFilter = activeLineFilter === type ? null : type;
+
+  document.querySelectorAll('.legend-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.filterType === activeLineFilter);
+  });
+
+  if (!activeLineFilter) {
+    document.querySelectorAll('#connectors path, #connectors circle').forEach(el => el.classList.remove('legend-hidden'));
+    document.querySelectorAll('.node').forEach(el => el.classList.remove('legend-hidden'));
+    return;
+  }
+
+  document.querySelectorAll('.node').forEach(el => el.classList.remove('legend-hidden'));
+  document.querySelectorAll('#connectors path, #connectors circle').forEach(el => {
+    const cls = el.getAttribute('class') || '';
+    let match = false;
+    if (activeLineFilter === 'blood') match = cls.indexOf('line-blood') !== -1;
+    else if (activeLineFilter === 'union') match = cls.indexOf('line-union') !== -1 || cls.indexOf('union-marker') !== -1;
+    else if (activeLineFilter === 'special') match = cls.indexOf('line-special') !== -1;
+    el.classList.toggle('legend-hidden', !match);
+  });
+}
+
+function initLegendFilter() {
+  document.getElementById('legend').addEventListener('click', e => {
+    const btn = e.target.closest('.legend-item');
+    if (!btn) return;
+    applyLineFilter(btn.dataset.filterType);
+  });
+}
+
+function init() {
+  const canvas = document.getElementById('canvas');
+  canvas.style.width = CANVAS_W + 'px';
+  canvas.style.height = CANVAS_H + 'px';
+
+  renderStats();
+  renderGenBands();
+  renderConnectors();
+  renderNodes();
+  initInteractions();
+  initDetailPanel();
+  initPanZoom();
+  initSearch();
+  initBranchFilter();
+  initLegendFilter();
+  initMinimap();
+  initHeaderToggle();
+  initFootNoteToggle();
+  focusDefaultView();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="大明与大清皇室世系谱在线浏览入口">
+  <title>明清皇室世系谱</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f0e8d8;
+      --muted: #bdb09b;
+      --line: rgba(234, 214, 179, .24);
+      --surface: rgba(20, 22, 25, .84);
+      --gold: #c9a56a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(136, 104, 58, .22), transparent 42%),
+        linear-gradient(145deg, #131619, #090a0c 70%);
+      font-family: "Noto Serif SC", "Songti SC", serif;
+    }
+
+    main {
+      width: min(960px, calc(100% - 36px));
+      padding: 72px 0;
+    }
+
+    header { margin-bottom: 42px; text-align: center; }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-size: 12px;
+      letter-spacing: .32em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(38px, 7vw, 74px);
+      font-weight: 400;
+      letter-spacing: .12em;
+    }
+
+    .intro {
+      margin: 18px auto 0;
+      color: var(--muted);
+      font-size: 15px;
+      letter-spacing: .08em;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      min-height: 270px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 34px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      color: inherit;
+      text-decoration: none;
+      background: var(--surface);
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .card:hover,
+    .card:focus-visible {
+      transform: translateY(-4px);
+      border-color: rgba(201, 165, 106, .72);
+      background: rgba(31, 32, 33, .94);
+      outline: none;
+    }
+
+    .dynasty {
+      color: var(--gold);
+      font-size: 12px;
+      letter-spacing: .28em;
+    }
+
+    h2 {
+      margin: 18px 0 10px;
+      font-size: clamp(29px, 4vw, 42px);
+      font-weight: 400;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .enter {
+      margin-top: 28px;
+      color: var(--ink);
+      font-size: 13px;
+      letter-spacing: .16em;
+    }
+
+    footer {
+      margin-top: 30px;
+      color: #80796d;
+      font-size: 12px;
+      text-align: center;
+      letter-spacing: .12em;
+    }
+
+    @media (max-width: 680px) {
+      main { padding: 48px 0; }
+      .grid { grid-template-columns: 1fr; }
+      .card { min-height: 220px; padding: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">IMPERIAL GENEALOGY</p>
+      <h1>明清皇室世系谱</h1>
+      <p class="intro">以世系为轴，浏览两代皇室宗族与帝位传承</p>
+    </header>
+
+    <section class="grid" aria-label="皇室世系谱入口">
+      <a class="card" href="./ming.html">
+        <div>
+          <span class="dynasty">1368—1644</span>
+          <h2>大明王朝宗室谱系</h2>
+          <p>从太祖朱元璋起，梳理明代皇位承继与宗室脉络。</p>
+        </div>
+        <span class="enter">进入皇明谱 →</span>
+      </a>
+
+      <a class="card" href="./qing.html">
+        <div>
+          <span class="dynasty">1616—1912</span>
+          <h2>大清皇室世系谱</h2>
+          <p>从太祖努尔哈赤至宣统，查看清代皇室世系与传承。</p>
+        </div>
+        <span class="enter">进入大清谱 →</span>
+      </a>
+    </section>
+
+    <footer>明清皇室世系谱 · 在线浏览</footer>
+  </main>
+</body>
+</html>

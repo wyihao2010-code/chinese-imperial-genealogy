@@ -1,0 +1,3150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>皇明谱 · 大明王朝宗室谱系</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400&family=Noto+Sans+SC:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090c;
+    --bg2: #0e0e12;
+    --bg3: #141418;
+    --text: #dfd9cc;
+    --text2: #f5f0e8;
+    --muted: #7d7870;
+    --dim: #3e3b35;
+    --gold: #c39e4f;
+    --gold2: #e8c97e;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-soft: rgba(255, 255, 255, 0.04);
+    --gold-dim: rgba(195, 158, 79, 0.15);
+    /* 新增：朱批印色，专用于表示非正常/非直系的皇位转移事件线，
+       取"朱笔批红"之意——明代奏章经皇帝朱笔批示后方可下发，
+       用同一色系标注"权力在此转手"的关键时刻，与血缘金线区分开来。 */
+    --vermilion: #a8503a;
+    --vermilion2: #d97c5c;
+    --vermilion-dim: rgba(168, 80, 58, 0.16);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Noto Sans SC", sans-serif;
+    height: 100%;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---------- Header ---------- */
+
+  header.topbar {
+    flex: 0 0 auto;
+    padding: 14px 5% 10px;
+    border-bottom: 1px solid var(--border-soft);
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%);
+    position: relative;
+    z-index: 5;
+    transition: padding 0.3s ease;
+  }
+  header.topbar.collapsed { padding: 9px 5%; border-bottom-color: transparent; }
+
+  .header-bar {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+  }
+
+  .eyebrow {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  h1 {
+    font-family: "Noto Serif SC", serif;
+    font-weight: 200;
+    font-size: clamp(19px, 2.4vw, 24px);
+    letter-spacing: 0.06em;
+    color: var(--text2);
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .subtitle {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .header-toggle {
+    margin-left: auto;
+    flex: 0 0 auto;
+    width: 26px;
+    height: 26px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s ease, color 0.2s ease;
+    align-self: center;
+  }
+  .header-toggle:hover { border-color: var(--gold); color: var(--gold2); }
+  .header-toggle .chevron { transition: transform 0.3s var(--ease-out); }
+  header.topbar.collapsed .header-toggle .chevron { transform: rotate(180deg); }
+
+  .header-body {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 0.32s var(--ease-out), opacity 0.25s ease, margin-top 0.32s ease;
+    opacity: 1;
+    margin-top: 10px;
+  }
+  .header-body-inner { overflow: hidden; min-height: 0; }
+  header.topbar.collapsed .header-body {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    margin-top: 0;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 32px;
+  }
+
+  .stats {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--dim);
+    white-space: nowrap;
+  }
+  .stats b { color: var(--muted); font-weight: 500; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 6px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    white-space: nowrap;
+    background: none;
+    border: 1px solid transparent;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .legend-item:hover { background: var(--border-soft); color: var(--text); }
+  .legend-item.active {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+    color: var(--gold2);
+  }
+
+  .swatch {
+    width: 22px;
+    height: 0;
+    border-top: 1.4px solid var(--gold);
+    flex: 0 0 auto;
+  }
+  .swatch.union { border-top-style: dashed; opacity: 0.7; }
+  .swatch.transfer { border-top-style: solid; border-top-color: var(--vermilion2); border-top-width: 2px; }
+  .swatch.restore {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 1.6px dashed var(--vermilion2);
+  }
+  .swatch.posthumous {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 1px dashed var(--muted); border-top: 1px dashed var(--muted);
+  }
+
+  .hint-scroll {
+    display: block;
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.04em;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .filter-row {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin-top: 9px;
+  }
+
+  /* ---------- Tree viewport ---------- */
+
+  main.tree-viewport {
+    flex: 1 1 auto;
+    overflow: hidden;
+    position: relative;
+    cursor: grab;
+    touch-action: none;
+    background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 34px 34px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+  }
+
+  main.tree-viewport.grabbing { cursor: grabbing; }
+
+  .tree-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+  }
+  .tree-canvas text,
+  .tree-canvas svg {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+  }
+
+  /* ---------- Zoom controls ---------- */
+
+  .zoom-controls {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    z-index: 15;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--border-soft);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .zoom-btn {
+    width: 34px;
+    height: 34px;
+    background: var(--bg2);
+    border: none;
+    color: var(--text);
+    font-size: 16px;
+    font-family: "Cormorant Garamond", serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .zoom-btn:hover { background: var(--bg3); color: var(--gold2); }
+  .zoom-btn.reset { font-size: 11px; letter-spacing: 0.03em; }
+
+  /* ---------- Search ---------- */
+
+  .search-wrap {
+    position: relative;
+    flex: 0 0 auto;
+    width: 220px;
+  }
+
+  .search-input {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: "Noto Sans SC", sans-serif;
+    font-size: 12.5px;
+    padding: 8px 30px 8px 12px;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .search-input::placeholder { color: var(--dim); }
+  .search-input:focus { border-color: var(--gold); }
+
+  .search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--dim);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 4px;
+    display: none;
+    line-height: 1;
+  }
+  .search-clear.show { display: block; }
+  .search-clear:hover { color: var(--gold2); }
+
+  .search-results {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    max-height: 320px;
+    overflow-y: auto;
+    z-index: 30;
+    display: none;
+  }
+  .search-results.show { display: block; }
+
+  .search-result-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 9px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-soft);
+    transition: background 0.15s ease;
+  }
+  .search-result-item:last-child { border-bottom: none; }
+  .search-result-item:hover, .search-result-item.kb-active { background: var(--gold-dim); }
+  .search-result-zh {
+    font-family: "Noto Serif SC", serif;
+    font-size: 13px;
+    color: var(--text2);
+  }
+  .search-result-role {
+    font-size: 10.5px;
+    color: var(--muted);
+  }
+  .search-empty {
+    padding: 14px 12px;
+    font-size: 11.5px;
+    color: var(--dim);
+    font-style: italic;
+  }
+
+  /* ---------- Minimap ---------- */
+
+  .minimap {
+    position: absolute;
+    left: 18px;
+    bottom: 18px;
+    z-index: 15;
+    background: rgba(14, 14, 18, 0.88);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+  }
+
+  .minimap canvas {
+    display: block;
+    cursor: pointer;
+  }
+
+  .minimap-viewport {
+    position: absolute;
+    border: 1.5px solid var(--gold2);
+    background: rgba(232, 201, 126, 0.08);
+    pointer-events: none;
+  }
+
+  /* ---------- Branch filter panel ---------- */
+
+  .branch-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .branch-btn {
+    font-size: 10.5px;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    cursor: pointer;
+    font-family: "Noto Sans SC", sans-serif;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .branch-btn:hover { border-color: var(--muted); color: var(--text); }
+  .branch-btn.active {
+    background: var(--gold-dim);
+    border-color: var(--gold);
+    color: var(--gold2);
+  }
+
+  /* ---------- Node branch dimming ---------- */
+
+  .node.branch-hidden { opacity: 0.08; }
+  #connectors path.branch-hidden,
+  #connectors circle.branch-hidden,
+  #events path.branch-hidden { opacity: 0.03 !important; }
+
+  .node.legend-hidden { opacity: 0.1; }
+  #connectors path.legend-hidden,
+  #connectors circle.legend-hidden,
+  #events path.legend-hidden { opacity: 0.04 !important; }
+
+  svg.connector-layer {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+    shape-rendering: geometricPrecision;
+  }
+
+  /* ---------- 世代背景带 ---------- */
+  .gen-bands {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+    user-select: none;
+  }
+  .gen-band {
+    position: absolute;
+    left: 0;
+    border-top: 1px solid var(--border-soft);
+  }
+  .gen-band:nth-child(odd) { background: rgba(255, 255, 255, 0.012); }
+  .gen-band-label {
+    position: absolute;
+    left: 22px;
+    top: 10px;
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    opacity: 0.75;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+
+  .line-blood, .line-union, .line-special {
+    fill: none;
+    transition: opacity 0.3s ease, stroke 0.3s ease;
+  }
+  .line-blood   { stroke: var(--gold); stroke-width: 1.6; opacity: 0.6; }
+  .line-union   { stroke: var(--gold); stroke-width: 1.2; stroke-dasharray: 4 4; opacity: 0.34; }
+  .line-special { stroke: var(--gold2); stroke-width: 1.7; stroke-dasharray: 1 3.4; opacity: 0.64; }
+
+  .line-blood.active, .line-union.active, .line-special.active { opacity: 1; }
+  .line-blood.dimmed, .line-union.dimmed, .line-special.dimmed { opacity: 0.06; }
+
+  /* 世代跳过标记点：沿"跨多代压缩连线"均匀排布的小圆点，填充背景色、
+     细金环描边，与 union-marker 呼应但更小更淡——提示"这一段省略了
+     若干代人"，而不是让长连线显得空荡、缺乏信息量。 */
+  circle.skip-marker {
+    fill: var(--bg) !important;
+    stroke-width: 1.1 !important;
+    opacity: 0.55;
+  }
+  circle.skip-marker.active { opacity: 0.95; }
+  circle.skip-marker.dimmed { opacity: 0.05; }
+
+  /* ---------- 事件连线：非正常继统 / 复位 / 兄终弟及 ----------
+     这是本谱系相对于希腊神谱新增的一层连线，用来标注"不是普通父子继承"
+     的关键时刻——靖难、夺门、兴王入继、南明拥立等。与血缘线共用同一套
+     Bézier 曲线数学，但颜色、箭头与虚实各不相同，一眼可辨。 */
+  svg.event-layer {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+    shape-rendering: geometricPrecision;
+  }
+
+  .line-transfer {
+    fill: none;
+    stroke: var(--vermilion);
+    stroke-width: 2;
+    opacity: 0.74;
+    transition: opacity 0.3s ease, stroke 0.3s ease;
+    marker-end: url(#arrow-transfer);
+  }
+  .line-restore {
+    fill: none;
+    stroke: var(--vermilion2);
+    stroke-width: 1.8;
+    stroke-dasharray: 2 3.6;
+    opacity: 0.78;
+    transition: opacity 0.3s ease, stroke 0.3s ease;
+    marker-end: url(#arrow-restore);
+  }
+  .line-fraternal {
+    fill: none;
+    stroke: var(--gold2);
+    stroke-width: 1.3;
+    stroke-dasharray: 5 3;
+    opacity: 0.56;
+    transition: opacity 0.3s ease, stroke 0.3s ease;
+  }
+  .line-transfer.active, .line-restore.active, .line-fraternal.active { opacity: 1; }
+  .line-transfer.dimmed, .line-restore.dimmed, .line-fraternal.dimmed { opacity: 0.05; }
+
+  .event-label {
+    font-family: "Noto Sans SC", sans-serif;
+    font-size: 10.5px;
+    letter-spacing: 0.03em;
+    fill: var(--vermilion2);
+    opacity: 0.92;
+    paint-order: stroke;
+    stroke: var(--bg);
+    stroke-width: 5px;
+    stroke-linejoin: round;
+    transition: opacity 0.3s ease;
+  }
+  .event-label.dimmed { opacity: 0.05; }
+  .event-label.active { opacity: 1; }
+
+  /* ---------- 血缘连线：父母 → 选中头像 的流光动效 ---------- */
+
+  svg.flow-layer {
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+    shape-rendering: geometricPrecision;
+  }
+
+  .flow-path {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+    transition: opacity 0.35s var(--ease-out);
+  }
+  .flow-path.show { opacity: 1; }
+
+  .flow-path .flow-core {
+    fill: none;
+    stroke: var(--gold2);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-dasharray: 16 58;
+    filter: drop-shadow(0 0 2px var(--gold2)) drop-shadow(0 0 6px rgba(232, 201, 126, 0.75));
+    animation-name: flow-travel;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  .flow-path .flow-halo {
+    fill: none;
+    stroke: var(--gold2);
+    stroke-linecap: round;
+    stroke-width: 5;
+    stroke-dasharray: 16 58;
+    opacity: 0.28;
+    filter: blur(3px);
+    animation-name: flow-travel;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  .flow-path.flow-event .flow-core {
+    stroke: var(--vermilion2);
+    filter: drop-shadow(0 0 2px var(--vermilion2)) drop-shadow(0 0 6px rgba(217, 124, 92, 0.75));
+  }
+  .flow-path.flow-event .flow-halo { stroke: var(--vermilion2); }
+
+  @keyframes flow-travel {
+    from { stroke-dashoffset: 0; }
+    to   { stroke-dashoffset: -740; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flow-path .flow-core, .flow-path .flow-halo { animation: none; }
+  }
+
+  .union-marker {
+    fill: var(--bg);
+    stroke: var(--gold);
+    stroke-width: 1;
+    transition: fill 0.3s ease, stroke 0.3s ease, opacity 0.3s ease;
+    opacity: 0.6;
+  }
+  .union-marker.active { fill: var(--gold2); stroke: var(--gold2); opacity: 1; }
+  .union-marker.dimmed { opacity: 0.06; }
+
+  /* ---------- Nodes ---------- */
+
+  .nodes-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .node,
+  .node * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.35s ease;
+  }
+
+  .node.dimmed { opacity: 0.26; }
+
+  .node:focus-visible .avatar {
+    outline: 2px solid var(--gold);
+    outline-offset: 4px;
+  }
+
+  .avatar {
+    position: relative;
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
+    flex: 0 0 auto;
+  }
+
+  /* 追尊/未正式在位：虚线边框，呼应"名分未足"的身份 */
+  .avatar.posthumous { border-style: dashed; }
+  /* 曾被废黜、后世方追复的帝后：在虚线基础上再压低一层不透明度，
+     视觉上像"暂时褪色、尚待昭雪"，与"从未在位"的纯虚线区分。 */
+  .avatar.deposed { border-style: dashed; opacity: 0.72; }
+  /* 压缩宗支节点：菱形而非圆形，一眼可辨"这里是被略去的若干代宗室" */
+  .avatar.compressed { border-radius: 6px; transform: rotate(45deg); }
+  .avatar.compressed .emblem,
+  .avatar.compressed .gender-badge { transform: rotate(-45deg); }
+
+  .node.active .avatar {
+    border-color: var(--gold2);
+    box-shadow: 0 0 0 4px var(--gold-dim);
+    background: var(--bg3);
+  }
+  .node.active .avatar.compressed { box-shadow: 0 0 0 4px var(--gold-dim); }
+
+  @keyframes parentPulse {
+    0%, 100% {
+      border-color: var(--border);
+      box-shadow: 0 0 0 0 rgba(232, 201, 126, 0);
+    }
+    50% {
+      border-color: var(--gold2);
+      box-shadow: 0 0 0 6px rgba(232, 201, 126, 0.22);
+    }
+  }
+  .node.parent-highlight .avatar {
+    animation: parentPulse 2.4s ease-in-out infinite;
+  }
+  .node.active.parent-highlight .avatar { animation: none; }
+
+  .gender-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 1;
+    font-family: "Cormorant Garamond", "Noto Sans SC", serif;
+    transition: border-color 0.35s ease, background 0.35s ease, opacity 0.35s ease;
+  }
+  .gender-badge.male   { color: #8fb3d9; }
+  .gender-badge.female { color: #d99fb0; }
+  .node.active .gender-badge {
+    border-color: var(--gold2);
+    background: var(--bg3);
+  }
+
+  .emblem {
+    width: 38px;
+    height: 38px;
+    stroke: var(--gold);
+    color: var(--gold);
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.86;
+    shape-rendering: geometricPrecision;
+    transition: stroke 0.35s ease, color 0.35s ease, opacity 0.35s ease;
+  }
+  .node.active .emblem { stroke: var(--gold2); color: var(--gold2); opacity: 1; }
+
+  .node-name-zh {
+    font-family: "Noto Serif SC", serif;
+    font-weight: 300;
+    font-size: 15px;
+    color: var(--text2);
+    white-space: nowrap;
+    transition: color 0.35s ease;
+  }
+  .node.active .node-name-zh { color: var(--gold2); }
+
+  .node-name-era {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  @keyframes nodeIn {
+    from { opacity: 0; transform: translate(-50%, -50%) translateY(12px); }
+    to   { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
+  }
+  .node.enter {
+    animation: nodeIn 0.7s var(--ease-out) both;
+  }
+
+  /* ---------- Tooltip ---------- */
+
+  .tooltip {
+    position: absolute;
+    max-width: 270px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+    padding: 14px 16px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    z-index: 20;
+    transform-origin: 0 0;
+  }
+  .tooltip.show { opacity: 1; }
+
+  .tooltip-name {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .tooltip-name .zh {
+    font-family: "Noto Serif SC", serif;
+    font-weight: 400;
+    font-size: 15px;
+    color: var(--text2);
+  }
+  .tooltip-name .era {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .tooltip-role {
+    font-size: 11.5px;
+    color: var(--gold);
+    letter-spacing: 0.03em;
+    margin-bottom: 8px;
+  }
+  .tooltip-parents {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .tooltip-special {
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: var(--text);
+    border-top: 1px solid var(--border-soft);
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+  .tooltip-special .mark { color: var(--vermilion2); }
+  .tooltip-note {
+    font-size: 10.5px;
+    line-height: 1.6;
+    color: var(--dim);
+    margin-top: 6px;
+  }
+
+  /* ---------- Detail panel ---------- */
+
+  .detail-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 4, 6, 0.62);
+    backdrop-filter: blur(3px);
+    z-index: 50;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.22s ease;
+  }
+  .detail-overlay.show { display: flex; }
+  .detail-overlay.show.in { opacity: 1; }
+
+  .detail-panel {
+    width: min(440px, 88vw);
+    max-height: min(620px, 82vh);
+    overflow-y: auto;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    padding: 30px 30px 26px;
+    position: relative;
+    transform: translateY(10px);
+    transition: transform 0.22s var(--ease-out);
+  }
+  .detail-overlay.show.in .detail-panel { transform: translateY(0); }
+
+  .detail-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 28px;
+    height: 28px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .detail-close:hover { border-color: var(--gold); color: var(--gold2); }
+
+  .detail-branch-tag {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    color: var(--gold2);
+    background: var(--gold-dim);
+    border: 1px solid rgba(195, 158, 79, 0.3);
+    padding: 3px 9px;
+    margin-bottom: 14px;
+    margin-right: 6px;
+  }
+  .detail-branch-tag.tag-nanming {
+    color: var(--vermilion2);
+    background: var(--vermilion-dim);
+    border-color: rgba(168, 80, 58, 0.35);
+  }
+
+  .detail-name {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .detail-name .zh {
+    font-family: "Noto Serif SC", serif;
+    font-weight: 300;
+    font-size: 26px;
+    color: var(--text2);
+  }
+  .detail-name .era {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .detail-title {
+    font-size: 12.5px;
+    color: var(--dim);
+    letter-spacing: 0.02em;
+    margin-bottom: 10px;
+  }
+  .detail-title .title-name {
+    font-family: "Noto Serif SC", serif;
+    color: var(--gold2);
+  }
+  .detail-lifespan {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 13.5px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .detail-lifespan .age-mark {
+    color: var(--gold2);
+    font-style: normal;
+    letter-spacing: 0.03em;
+  }
+  .detail-role {
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 0.03em;
+    margin-bottom: 4px;
+  }
+  .detail-kind {
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.03em;
+    margin-bottom: 18px;
+  }
+
+  .detail-section {
+    border-top: 1px solid var(--border-soft);
+    padding-top: 14px;
+    margin-top: 14px;
+  }
+  .detail-section-title {
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 9px;
+  }
+
+  .detail-rel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .detail-rel-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text);
+    background: none;
+    border: none;
+    padding: 3px 0;
+    cursor: pointer;
+    text-align: left;
+    font-family: "Noto Sans SC", sans-serif;
+    transition: color 0.15s ease;
+    width: 100%;
+  }
+  .detail-rel-item:hover { color: var(--gold2); }
+  .detail-rel-item .rel-tag {
+    flex: 0 0 auto;
+    font-size: 10px;
+    color: var(--dim);
+    min-width: 28px;
+  }
+  .detail-rel-item .rel-role {
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: auto;
+    padding-left: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .detail-empty {
+    font-size: 11.5px;
+    color: var(--dim);
+    font-style: italic;
+  }
+
+  .detail-special, .detail-note-text {
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: var(--text);
+  }
+  .detail-special .mark { color: var(--vermilion2); }
+  .detail-note-text { color: var(--muted); }
+
+  .detail-myth {
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: var(--text2);
+    border-left: 2px solid var(--gold);
+    padding-left: 14px;
+  }
+  .detail-myth-title {
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold2);
+    margin-bottom: 9px;
+  }
+
+  .detail-events {
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+  .detail-event-row {
+    display: flex;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .detail-event-row:last-child { border-bottom: none; }
+  .detail-event-row .event-year {
+    flex: 0 0 auto;
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    color: var(--vermilion2);
+    font-size: 12px;
+    min-width: 64px;
+  }
+
+  .myth-link {
+    color: var(--gold2);
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  .myth-link:hover, .myth-link:focus-visible {
+    color: var(--text2);
+    outline: none;
+  }
+
+  /* ---------- Footer ---------- */
+
+  footer.foot-note {
+    flex: 0 0 auto;
+    padding: 12px 5% 16px;
+    border-top: 1px solid var(--border-soft);
+    font-size: 10.5px;
+    line-height: 1.7;
+    color: var(--dim);
+    letter-spacing: 0.02em;
+  }
+
+  .foot-note-toggle {
+    display: none;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: var(--dim);
+    cursor: pointer;
+    text-align: left;
+  }
+  .foot-note-chevron {
+    flex: 0 0 auto;
+    font-size: 11px;
+    transition: transform 0.2s ease;
+    opacity: 0.7;
+  }
+  .foot-note-toggle[aria-expanded="true"] .foot-note-chevron { transform: rotate(180deg); }
+  .foot-note-full { }
+
+  /* ---------- Responsive ---------- */
+
+  @media (max-width: 720px) {
+    header.topbar { padding: 12px 6% 8px; }
+    .legend { display: none; }
+    footer.foot-note { padding: 8px 6% 10px; }
+
+    .foot-note-toggle { display: flex; }
+    .foot-note-full {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      margin-top: 0;
+      transition: max-height 0.25s ease, opacity 0.2s ease, margin-top 0.25s ease;
+    }
+    .foot-note-full.expanded {
+      max-height: 400px;
+      opacity: 1;
+      margin-top: 8px;
+    }
+
+    .foot-note-toggle { display: flex; }
+    .foot-note-summary {
+      font-size: 11px;
+      color: var(--gold);
+      opacity: 0.8;
+    }
+    .foot-note-full {
+      display: none;
+      margin-top: 8px;
+      max-height: 30vh;
+      overflow-y: auto;
+    }
+    .foot-note-full.expanded { display: block; }
+
+    .search-wrap { width: 100%; order: -1; }
+    .stats { order: 1; }
+
+    .filter-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .branch-btn { font-size: 10px; padding: 4px 9px; }
+
+    .minimap { display: none; }
+  }
+
+  @media (max-height: 480px) {
+    .filter-row { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .node, .avatar, .emblem, .node-name-zh,
+    .line-blood, .line-union, .line-special, .line-transfer, .line-restore, .line-fraternal, .union-marker,
+    .tooltip {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+  <header class="topbar" id="topbar">
+    <div class="header-bar">
+      <div>
+        <p class="eyebrow">Great Ming · 1368—1644</p>
+        <h1>皇明谱</h1>
+      </div>
+      <p class="subtitle">大明王朝宗室谱系 · 十六帝正统与南明诸支</p>
+      <button class="header-toggle" id="headerToggle" aria-expanded="true" aria-label="收起表头" type="button">
+        <svg class="chevron" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="header-body" id="headerBody">
+      <div class="header-body-inner">
+        <div class="meta-row">
+          <div class="search-wrap">
+            <input class="search-input" id="searchInput" type="text" placeholder="搜索人物 · 年号 · 封号" autocomplete="off">
+            <button class="search-clear" id="searchClear" type="button" aria-label="清空搜索">×</button>
+            <div class="search-results" id="searchResults" role="listbox"></div>
+          </div>
+          <div class="stats" id="stats"></div>
+          <div class="legend" id="legend">
+            <button class="legend-item" data-filter-type="blood" type="button"><span class="swatch"></span>父子血缘</button>
+            <button class="legend-item" data-filter-type="union" type="button"><span class="swatch union"></span>婚配结合</button>
+            <button class="legend-item" data-filter-type="transfer" type="button"><span class="swatch transfer"></span>非直系继统</button>
+            <button class="legend-item" data-filter-type="restore" type="button"><span class="swatch restore"></span>复位</button>
+            <button class="legend-item" data-filter-type="posthumous" type="button"><span class="swatch posthumous"></span>追尊 · 未正式在位</button>
+          </div>
+        </div>
+        <div class="filter-row">
+          <div class="branch-filter" id="branchFilter"></div>
+          <span class="hint-scroll">拖动平移 · 滚轮缩放 · 单击关联高亮 · 右键/长按查看详情</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="tree-viewport" id="viewport">
+    <div class="tree-canvas" id="canvas">
+      <div class="gen-bands" id="genBands"></div>
+      <svg class="connector-layer" id="connectors"></svg>
+      <svg class="event-layer" id="events">
+        <defs>
+          <marker id="arrow-transfer" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 Z" fill="var(--vermilion)"></path>
+          </marker>
+          <marker id="arrow-restore" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 Z" fill="var(--vermilion2)"></path>
+          </marker>
+        </defs>
+      </svg>
+      <svg class="flow-layer" id="flowLayer"></svg>
+      <div class="nodes-layer" id="nodes"></div>
+      <div class="tooltip" id="tooltip"></div>
+    </div>
+
+    <div class="zoom-controls">
+      <button class="zoom-btn" id="zoomIn" type="button" aria-label="放大">+</button>
+      <button class="zoom-btn reset" id="zoomReset" type="button" aria-label="重置视图">100%</button>
+      <button class="zoom-btn" id="zoomOut" type="button" aria-label="缩小">−</button>
+    </div>
+
+    <div class="minimap" id="minimap">
+      <canvas id="minimapCanvas"></canvas>
+      <div class="minimap-viewport" id="minimapViewport"></div>
+    </div>
+  </main>
+
+  <div class="detail-overlay" id="detailOverlay">
+    <div class="detail-panel" id="detailPanel" role="dialog" aria-modal="true">
+      <button class="detail-close" id="detailClose" aria-label="关闭详情" type="button">×</button>
+      <div id="detailContent"></div>
+    </div>
+  </div>
+
+  <footer class="foot-note">
+    <button class="foot-note-toggle" id="footNoteToggle" aria-expanded="false" type="button">
+      <span class="foot-note-summary">谱系说明与取材依据</span>
+      <span class="foot-note-chevron">⌄</span>
+    </button>
+    <div class="foot-note-full" id="footNoteFull">
+      本谱以朱元璋至崇祯的十六位正史皇帝为主干，旁及建文支、兴王入继支与南明弘光、隆武、绍武、永历、鲁监国五支，并保留唐藩、鲁藩两处以"压缩节点"标注的宗室世系（详见其详情面板说明，代数与生卒年份存在不同程度的史料不确定性，请以《明史》《明实录》等一手文献为准）。年号、庙号、谥号及即位方式的史实描述，主要依据《明史》相关列传与通行研究整理，个别争议之处（如朱祁钰庙号追复的确切阶段、唐藩鲁藩中间世代的具体人数）已在对应人物详情中标注存疑。本谱系为示意性质的族谱可视化，并非严格意义上的宗室玉牒复原，旁支郡王、将军以下宗室及绝大多数嫔妃、公主均未收录。数据组织方式（人物节点 · 血缘/结合关系 · 世代行序 · 分支筛选）沿用同一站点的希腊神谱可视化框架。
+    </div>
+  </footer>
+
+<script>
+/* =========================================================
+   皇明谱 · 大明王朝宗室谱系
+   ---------------------------------------------------------
+   数据组织方式沿用同站"希腊神谱"框架：人物节点 + 血缘关系 +
+   结合关系 + 世代行序 + 分支筛选，独立于渲染逻辑之外。
+   与希腊神谱的关键差异：明代宗室谱系的核心矛盾不是"谁生了谁"，
+   而是"皇位如何在非直系之间转手"——因此在原有血缘线(line-blood)、
+   结合线(line-union)之外，新增一层独立的"事件连线"(EVENTS)，
+   专门标注靖难、夺门、兴王入继、南明拥立等关键时刻，用朱红色系
+   与血缘金线区分，方向性用箭头明确表达"权力从谁转向了谁"。
+   ========================================================= */
+
+/* ---------- 图腾图标：按"身份等级"而非"个人专属"设计 ----------
+   希腊神谱为每位神祇设计专属图腾（雷电、三叉戟……），但明代宗室
+   并无类似的个人专属符号传统；转而参照明代宫廷等级制度本身
+   （冕旒、凤冠、蟠螭纹、簪钗……）设计一组"身份等级图腾"，
+   同一等级共用同一图腾，与配色、姓名文字共同指示身份。
+   viewBox 沿用 0 0 40 40，坐标范围与描边风格与希腊神谱保持一致。 */
+const EMBLEMS = {
+  // 冕旒：曾正式称帝者（含北京十六帝与南明四帝）
+  mianguan: '<path d="M10 17 H30 M10 17 L8 21 M30 17 L32 21 M14 17 V13.5 M20 17 V11.5 M26 17 V13.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="23.5" r="1.15" fill="currentColor" stroke="none"/><circle cx="20" cy="25.5" r="1.15" fill="currentColor" stroke="none"/><circle cx="26" cy="23.5" r="1.15" fill="currentColor" stroke="none"/><path d="M12.5 27.5 Q20 32 27.5 27.5" stroke-linecap="round"/>',
+  // 凤冠：皇后 / 太后等正配
+  fenghuang: '<path d="M15 25 Q11.5 18.5 16.5 14.5 Q21 11 26 14" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.5 14.5 Q23 13 28 18.5" stroke-linecap="round"/><path d="M15 25 Q18 28 23 26.5 Q29 24.5 31 18.5" stroke-linecap="round"/><circle cx="16.5" cy="16" r="1" fill="currentColor" stroke="none"/>',
+  // 簪钗：受宠但非正配的妃嫔
+  zan: '<path d="M20 10 V24" stroke-linecap="round"/><path d="M20 10 L16.5 13.5 M20 10 L23.5 13.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="28" r="3.2"/>',
+  // 蟠螭纹：亲王 / 郡王 / 未及位的储君与藩王
+  panchi: '<path d="M12.5 29 Q10 20.5 15.5 16.5 Q20.5 12.5 18 18.5 Q15.5 24.5 22 22.5 Q28.5 20.5 26.5 14" stroke-linecap="round" stroke-linejoin="round"/><path d="M26.5 14 L29.5 11 M26.5 14 L28.5 16.5" stroke-linecap="round"/><circle cx="13" cy="28" r="1" fill="currentColor" stroke="none"/>',
+  // 童冠：早殇皇子皇孙 / 尚未及冠者
+  taizi: '<path d="M13 21 Q20 12.5 27 21 L27 24.5 L13 24.5 Z" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 24.5 Q20 28.5 27 24.5" stroke-linecap="round"/>',
+  // 监国印：受命监国、未正式称帝者
+  yin: '<rect x="12.5" y="19" width="15" height="10.5" rx="1" stroke-linejoin="round"/><path d="M16.5 19 V13.5 Q20 10.5 23.5 13.5 V19" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.5 24.3 H24.5" stroke-linecap="round"/>',
+  // 牌位：追尊而未曾在位的先世祖先
+  paiwei: '<path d="M14.5 30.5 V16.5 Q14.5 11 20 11 Q25.5 11 25.5 16.5 V30.5 Z" stroke-linejoin="round"/><path d="M17 30.5 V18 M23 30.5 V18" stroke-linecap="round"/>',
+  // 阙楼：世系压缩节点，代表被略去的若干代宗室
+  queque: '<path d="M13 30.5 V17.5 Q13 12 20 12 Q27 12 27 17.5 V30.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 22.5 H28" stroke-linecap="round"/><circle cx="16.5" cy="27" r="0.9" fill="currentColor" stroke="none"/><circle cx="20" cy="27" r="0.9" fill="currentColor" stroke="none"/><circle cx="23.5" cy="27" r="0.9" fill="currentColor" stroke="none"/>',
+  default: '<circle cx="20" cy="20" r="9"/>'
+};
+
+/* ---------- 人物数据 ----------
+   字段说明：
+   branches：分支标签数组（main=皇统主线 · jianwen=建文支 · xingwang=兴王入继支 ·
+             nanming=南明诸帝 · fanwang=重要藩王支），多数人只属一支，
+             少数"过渡人物"（如朱厚熜）同时属于两支，供分支筛选与统计使用。
+   zh：本名（讳）。title：庙号/年号/封号简称，显示于详情面板与提示框。
+   dates：在位或生卒年份，显示于头像下方的次要标签（对照希腊神谱的罗马名位置，
+          此处替换为对历史图表更有意义的纪年信息）。
+   role：一句话身份定位。parents：血缘父母 id 数组（0–2 个）。
+   emblem：引用 EMBLEMS 中的等级图腾。gender：'m' | 'f' | 'group'。
+   posthumous：追尊而未曾正式在位（对应虚线头像，呼应希腊神谱的"凡人"处理）。
+   deposed：命运中曾被废黜/罢黜/罢兵被俘等重大挫折（虚线+褪色头像）。
+   compressed：世系压缩占位节点（菱形头像）。
+   special：非正常继统/命运转折的简短说明（触发详情面板"特殊之处"分区）。
+   note：补充说明/存疑之处。story：较完整的历史叙事，显示于详情面板"史事"分区。 */
+const PEOPLE = {
+
+  zuzong4: {
+    branches: ['main'], zh: '追尊四祖', title: '德祖·懿祖·熙祖·仁祖', dates: '',
+    role: '朱元璋追尊的四代先人', parents: [], emblem: 'queque', gender: 'group', compressed: true,
+    note: '高祖朱百六（追尊德祖玄皇帝）→曾祖朱四九（追尊懿祖恒皇帝）→祖父朱初一（追尊熙祖裕皇帝）→父朱世珍/朱五四（追尊仁祖淳皇帝，元配陈氏）。四人生卒年月多不可考，仅存洪武初年追上的庙号谥号，此处压缩为一个节点，不展开兄弟姊妹，以免序章喧宾夺主。'
+  },
+  yuanzhang: {
+    branches: ['main'], zh: '朱元璋', title: '明太祖 · 洪武', dates: '在位 1368–1398',
+    role: '开国皇帝', parents: ['zuzong4'], emblem: 'mianguan', gender: 'm',
+    life: [1328, 1398],
+    story: '出身濠州钟离贫农，早年为僧云游，投身红巾军后崛起，1368年于应天称帝，国号大明，建元洪武。在位三十一年，废丞相、立卫所、编《大明律》与《皇明祖训》，为宗室继统立下"父死子继、兄终弟及"的基本规矩——而这条规矩此后两百余年间不断被现实打破，成为本谱系反复出现的主题。'
+  },
+  mahuanghou: {
+    branches: ['main'], zh: '马皇后', title: '孝慈高皇后', dates: '?–1382',
+    role: '太祖元配，"马大脚"', parents: [], emblem: 'fenghuang', gender: 'f',
+    life: [null, 1382],
+    note: '民间称"马大脚"，与太祖患难与共，以贤德著称于史。'
+  },
+  biao: {
+    branches: ['jianwen'], zh: '朱标', title: '懿文太子（追庙号兴宗）', dates: '1355–1392',
+    role: '太祖嫡长子，早殇太子', parents: ['yuanzhang', 'mahuanghou'], emblem: 'panchi', gender: 'm',
+    life: [1355, 1392],
+    posthumous: true,
+    story: '洪武元年立为皇太子，性情宽仁，太祖对其寄望极深。洪武二十五年（1392）病逝，年三十七岁，未及继位。其子朱允炆随后被立为皇太孙——这是明代最重要的一次"计划外"转折：若朱标未早逝，靖难之役或许根本不会发生。建文帝即位后追尊其父庙号"兴宗"，朱棣靖难成功后废除此庙号，恢复"懿文太子"旧称；南明弘光元年（1644）再次追上庙号"兴宗"。'
+  },
+  di: {
+    branches: ['main'], zh: '朱棣', title: '明成祖 · 永乐', dates: '在位 1402–1424',
+    role: '以藩王身份夺位的皇帝', parents: ['yuanzhang', 'mahuanghou'], emblem: 'mianguan', gender: 'm',
+    life: [1360, 1424],
+    special: '经"靖难之役"武力夺位，而非依父死子继的常规继统（见与朱允炆之间的事件连线）。',
+    story: '封燕王，就藩北平，屡立边功。建文帝削藩之际，以"清君侧"为名起兵，历时三年攻入南京，建文帝下落成谜。朱棣即位后迁都北京、五征漠北、遣郑和下西洋、修《永乐大典》，开创明代第二个盛世，但其皇位的合法性争议贯穿终明一代——修改《太祖实录》以自证正统、大肆诛戮建文旧臣，都是这场"计划外继统"留下的阴影。'
+  },
+  tan: {
+    branches: ['fanwang'], zh: '朱檀', title: '鲁荒王', dates: '1370–1390',
+    role: '太祖诸子，鲁藩始封', parents: ['yuanzhang'], emblem: 'panchi', gender: 'm',
+    life: [1370, 1390],
+    note: '就藩兖州，因服食丹药致疾早逝，太祖以"荒"字定谥，含警诫之意。鲁藩世系此后延续近三百年，直至南明覆亡才告终结。'
+  },
+  gang: {
+    branches: ['fanwang'], zh: '朱桱', title: '唐定王', dates: '1386–1415',
+    role: '太祖诸子，唐藩始封', parents: ['yuanzhang'], emblem: 'panchi', gender: 'm',
+    life: [1386, 1415],
+    note: '就藩南阳，唐藩世系历经八代，直至南明隆武、绍武二帝方才重新走入史册中心。'
+  },
+  yunwen: {
+    branches: ['jianwen'], zh: '朱允炆', title: '建文帝（追庙号惠宗）', dates: '在位 1398–1402',
+    role: '太祖皇太孙，靖难之役后下落不明', parents: ['biao', 'lv_shi'], emblem: 'mianguan', gender: 'm',
+    life: [1377, null],
+    deposed: true,
+    special: '被四叔朱棣以武力推翻（靖难之役），此后下落成谜，成为明代最大悬案之一。',
+    story: '以皇太孙身份继位，年号建文，锐意削藩、宽刑省狱，史称"建文新政"。削藩过快触动诸王利益，燕王朱棣起兵靖难，历时四年，建文四年（1402）南京城破，宫中大火，建文帝本人生死不明——民间长期流传其乔装为僧、云游西南的传说。朱棣不承认建文年号，改称洪武三十五年，直到万历二十三年（1595）明神宗才下诏恢复"建文"年号的官方记载；南明弘光元年（1644）追上庙号"惠宗"。',
+    note: '与四叔朱棣之间的"靖难之役"是本谱系第一处重大非直系继统事件，见图中朱红事件线。'
+  },
+  xiongying: {
+    branches: ['jianwen'], zh: '朱雄英', title: '虞怀王', dates: '1374–1382',
+    role: '朱标长子，八岁早殇', parents: ['biao', 'chang_shi'], emblem: 'taizi', gender: 'm',
+    life: [1374, 1382],
+    note: '未及序齿即已早逝，其弟朱允炆才得以被立为皇太孙。'
+  },
+  yuntun: {
+    branches: ['jianwen'], zh: '朱允熥', title: '吴王 → 广泽王', dates: '1378–1417',
+    role: '朱标三子', parents: ['biao', 'chang_shi'], emblem: 'panchi', gender: 'm',
+    life: [1378, 1417],
+    note: '靖难之役后被朱棣降为广泽王，旋即废为庶人，幽禁而终。'
+  },
+  xuhuanghou: {
+    branches: ['main'], zh: '徐皇后', title: '仁孝文皇后', dates: '1362–1407',
+    role: '成祖元配，开国名将徐达之女', parents: [], emblem: 'fenghuang', gender: 'f',
+    life: [1362, 1407],
+    note: '徐达长女，靖难期间曾亲自督守北平城防。'
+  },
+  gaozhi: {
+    branches: ['main'], zh: '朱高炽', title: '明仁宗 · 洪熙', dates: '在位 1424–1425',
+    role: '守成之君，在位仅十个月', parents: ['di', 'xuhuanghou'], emblem: 'mianguan', gender: 'm',
+    life: [1378, 1425],
+    story: '体态肥胖、不善骑射，靖难期间却以监国之姿死守北平，屡建奇功。在位不足一年即病逝，但与其子宣宗共同开创"仁宣之治"，后世评价极高。'
+  },
+  gaoxu: {
+    branches: ['fanwang'], zh: '朱高煦', title: '汉王', dates: '1380–1426',
+    role: '成祖次子，曾谋夺储位', parents: ['di', 'xuhuanghou'], emblem: 'panchi', gender: 'm',
+    life: [1380, 1426],
+    note: '靖难中战功赫赫，一度以为父亲将传位于己，仁宗即位后就藩乐安，宣德元年（1426）起兵谋反，兵败被废为庶人，后被侄儿宣宗处死。'
+  },
+  gaosui: {
+    branches: ['fanwang'], zh: '朱高燧', title: '赵王', dates: '1383–1431',
+    role: '成祖三子', parents: ['di', 'xuhuanghou'], emblem: 'panchi', gender: 'm',
+    life: [1383, 1431],
+    note: '曾与兄长朱高煦一同觊觎储位，后自我收敛，得以善终。'
+  },
+  zhanshan: {
+    branches: ['fanwang'], zh: '朱瞻墡', title: '襄王', dates: '1406–1478',
+    role: '仁宗五子，两度被视为皇位候选人', parents: ['gaozhi'], emblem: 'panchi', gender: 'm',
+    life: [1406, 1478],
+    note: '土木之变与夺门之变期间，都曾被朝臣提议迎立为帝，但两次都未成事——是理解明代中期皇位继承张力的重要参照人物，却始终未真正卷入权力核心。'
+  },
+  zhanji: {
+    branches: ['main'], zh: '朱瞻基', title: '明宣宗 · 宣德', dates: '在位 1425–1435',
+    role: '仁宣之治的缔造者', parents: ['gaozhi', 'zhang_huanghou'], emblem: 'mianguan', gender: 'm',
+    life: [1398, 1435],
+    story: '幼年即受祖父朱棣钟爱，即位后平定汉王朱高煦叛乱，与其父共同开创"仁宣之治"。英年早逝，年仅三十六岁，留下年仅八岁的太子朱祁镇，为十四年后的土木堡之变埋下隐患。'
+  },
+  sun_taihou: {
+    branches: ['main'], zh: '孙太后', title: '孝恭章皇后', dates: '1399–1462',
+    role: '宣宗继后，正统景泰之际的关键决策者', parents: [], emblem: 'fenghuang', gender: 'f',
+    life: [1399, 1462],
+    note: '土木堡之变后，正是她下诏立英宗幼子朱见深为皇太子、命郕王朱祁钰监国，为危局中的皇位过渡提供了名分依据。'
+  },
+  qizhen: {
+    branches: ['main'], zh: '朱祁镇', title: '明英宗 · 正统 / 天顺', dates: '在位 1435–1449, 1457–1464',
+    role: '两次在位的皇帝，土木之变被俘者', parents: ['zhanji', 'sun_taihou'], emblem: 'mianguan', gender: 'm',
+    life: [1427, 1464],
+    special: '正统十四年（1449）土木堡之变被俘后失位，天顺元年（1457）经"夺门之变"复位，是明代唯一两度在位的皇帝。',
+    story: '九岁即位，宠信宦官王振。正统十四年御驾亲征瓦剌，土木堡兵败被俘，京师震动。也先挟持英宗叩关，明廷在于谦力主下拥立其弟郕王朱祁钰监国继而称帝，英宗遥尊为太上皇。景泰元年被释归国后遭软禁于南宫七年，直至景泰八年（1457）武清侯石亨等发动夺门之变，迎其复位，改元天顺——期间处死了保卫北京立下大功的于谦。'
+  },
+  qiyu: {
+    branches: ['main'], zh: '朱祁钰', title: '明代宗 · 景泰', dates: '在位 1449–1457',
+    role: '危局中受命监国继而称帝，复位后被废', parents: ['zhanji'], emblem: 'mianguan', gender: 'm',
+    life: [1428, 1457],
+    deposed: true,
+    special: '经土木之变后的非常规拥立而称帝；复位后的英宗将其废黜，未能葬入明十三陵。',
+    story: '宣宗次子，母贤妃吴氏。土木堡之变后受命监国、旋即称帝，重用于谦取得北京保卫战的胜利，令风雨飘摇的明廷转危为安。景泰八年病重之际，英宗一党发动夺门之变复辟，代宗被废为郕王，不久去世，谥以恶谥"戾"，以亲王礼葬于北京西山。宪宗成化十一年（1475）恢复其皇帝尊号（谥"恭仁康定景皇帝"），但庙号"代宗"迟至南明弘光元年（1644）才被追加，终明一代始终未获官方完整承认。'
+  },
+  jianshen: {
+    branches: ['main'], zh: '朱见深', title: '明宪宗 · 成化', dates: '在位 1464–1487',
+    role: '幼年经历两度废立的皇帝', parents: ['qizhen'], emblem: 'mianguan', gender: 'm',
+    life: [1447, 1487],
+    note: '幼年历经土木之变、被废太子、英宗复位再立为太子的反复动荡，即位后为叔父代宗恢复帝号、为于谦平反昭雪。'
+  },
+  youtang: {
+    branches: ['main'], zh: '朱祐樘', title: '明孝宗 · 弘治', dates: '在位 1487–1505',
+    role: '"弘治中兴"的缔造者', parents: ['jianshen'], emblem: 'mianguan', gender: 'm',
+    life: [1470, 1505],
+    note: '终身只立张皇后一人，不设其他嫔妃，为明代仅见。勤政爱民，史称"弘治中兴"。'
+  },
+  youyuan: {
+    branches: ['xingwang'], zh: '朱祐杬', title: '兴献王（追尊睿宗献皇帝）', dates: '1476–1519',
+    role: '宪宗四子，因子入继而被追尊为帝', parents: ['jianshen'], emblem: 'panchi', gender: 'm',
+    life: [1476, 1519],
+    posthumous: true,
+    story: '就藩安陆，本与皇位无涉。正德十六年（1521）其子朱厚熜以堂弟身份入继大统，是为嘉靖帝。嘉靖帝即位后坚持追尊生父为"皇考"、上庙号"睿宗"、谥"献皇帝"，与朝臣爆发长达三年的"大礼议"之争，是明代中期最重要的一场礼法与皇权之争。'
+  },
+  houzhao: {
+    branches: ['main'], zh: '朱厚照', title: '明武宗 · 正德', dates: '在位 1505–1521',
+    role: '无嗣而终，引发旁支入继', parents: ['youtang'], emblem: 'mianguan', gender: 'm',
+    life: [1491, 1521],
+    special: '正德十六年病逝，无子嗣，皇位由堂弟朱厚熜以"兴王入继"方式承接。',
+    story: '自号"总督军务威武大将军朱寿"，性喜游乐征伐，屡次微服出巡、亲征塞外。正德十六年（1521）南巡归来后病逝，年三十一岁，未留下子嗣——太祖诸子中距离皇统最近的兴献王一系，由此被推上前台。'
+  },
+  houcong: {
+    branches: ['main', 'xingwang'], zh: '朱厚熜', title: '明世宗 · 嘉靖', dates: '在位 1521–1567',
+    role: '以宗藩身份入继大统的皇帝', parents: ['youyuan'], emblem: 'mianguan', gender: 'm',
+    life: [1507, 1566],
+    special: '正德帝无嗣而终，以宪宗孙、兴献王世子的身份被援引《皇明祖训》"兄终弟及"条文迎立，而非以皇子身份继位。',
+    story: '十五岁自安陆入京继位，即位之初便与朝臣就"该称孝宗为父、还是称生父兴献王为父"爆发"大礼议"之争，历时三年，最终以嘉靖帝坚持追尊生父告终。在位四十五年，中后期沉迷修道炼丹、二十余年不上朝，却始终牢牢掌控朝局；任内严嵩专权，也留下"倭患"与"庚戌之变"等边患危机。'
+  },
+  zaiji: {
+    branches: ['main'], zh: '朱载坖', title: '明穆宗 · 隆庆', dates: '在位 1567–1572',
+    role: '开启"隆庆开关"的过渡之君', parents: ['houcong'], emblem: 'mianguan', gender: 'm',
+    life: [1537, 1572],
+    note: '常见别写"朱载垕"。在位仅六年，开放海禁（史称"隆庆开关"）、与蒙古俺答汗议和封贡，为张居正日后改革铺垫了相对安定的外部局面。'
+  },
+  yijun: {
+    branches: ['main'], zh: '朱翊钧', title: '明神宗 · 万历', dates: '在位 1572–1620',
+    role: '在位四十八年，明代在位最久的皇帝', parents: ['zaiji'], emblem: 'mianguan', gender: 'm',
+    life: [1563, 1620],
+    special: '因宠爱郑贵妃与三子朱常洵，与朝臣就皇太子人选爆发长达十余年的"国本之争"。',
+    story: '十岁即位，张居正辅政十年，推行改革、国库充盈。亲政后逐渐怠政，中后期二十余年不上朝、不郊祀、不见大臣，却仍通过奏章批红牢牢掌控朝局。因迟迟不肯依"立嫡立长"惯例册立长子朱常洛为太子、转而属意宠妃郑贵妃之子朱常洵，与内阁及言官爆发旷日持久的"国本之争"，直至万历二十九年（1601）才勉强册立常洛，但已元气大伤——后世多将明亡的种子追溯至万历一朝的党争与怠政。'
+  },
+  zheng_guifei: {
+    branches: ['main'], zh: '郑贵妃', title: '恭恪惠荣和靖皇贵妃', dates: '1565–1630',
+    role: '万历宠妃，"国本之争"的中心人物', parents: [], emblem: 'zan', gender: 'f',
+    life: [1565, 1630],
+    note: '万历帝欲立其子朱常洵为太子而不得，是"国本之争"迁延十余年的核心导火索；后又牵涉"妖书案""梃击案"等宫廷疑案。'
+  },
+  changluo: {
+    branches: ['main'], zh: '朱常洛', title: '明光宗 · 泰昌', dates: '在位 1620',
+    role: '"国本之争"的最终胜出者，在位仅一个月', parents: ['yijun'], emblem: 'mianguan', gender: 'm',
+    life: [1582, 1620],
+    note: '万历长子，母为宫女出身的恭妃王氏，因不受父亲宠爱、又逢"国本之争"迁延多年，直到二十岁才被册立为太子。即位仅一个月即因服用"红丸"暴毙，史称"红丸案"，为明末三大疑案之一。'
+  },
+  changxun: {
+    branches: ['fanwang'], zh: '朱常洵', title: '福王', dates: '1586–1641',
+    role: '万历宠妃郑贵妃之子，"国本之争"焦点', parents: ['yijun', 'zheng_guifei'], emblem: 'panchi', gender: 'm',
+    life: [1586, 1641],
+    note: '万历帝一度属意立其为太子而未果，就藩洛阳，广蓄财货。崇祯十四年（1641）李自成攻破洛阳，福王遇害，其世子朱由崧仓皇南逃，三年后被拥立为南明弘光帝。'
+  },
+  changying: {
+    branches: ['fanwang'], zh: '朱常瀛', title: '桂王', dates: '1597–1645',
+    role: '万历七子，就藩衡州', parents: ['yijun'], emblem: 'panchi', gender: 'm',
+    life: [1597, 1645],
+    note: '明亡前夕辗转避乱于广西，其子朱由榔在他去世后不久被拥立为南明永历帝，成为南明抵抗时间最长的一支政权。'
+  },
+  youxiao: {
+    branches: ['main'], zh: '朱由校', title: '明熹宗 · 天启', dates: '在位 1620–1627',
+    role: '"木匠皇帝"，宦官魏忠贤专权', parents: ['changluo'], emblem: 'mianguan', gender: 'm',
+    life: [1605, 1627],
+    special: '落水染疾、诸子皆夭，临终遗命传位于弟朱由检，是明代最后一次和平的兄终弟及。',
+    story: '酷爱木工制作，疏于政事，宦官魏忠贤趁势专权，阉党势力遍布朝野，东林党人惨遭迫害。天启七年（1627）落水后病重，因膝下无存活皇子，遗诏传位于弟信王朱由检，即崇祯帝。'
+  },
+  youjian: {
+    branches: ['main'], zh: '朱由检', title: '明思宗 · 崇祯', dates: '在位 1627–1644',
+    role: '明朝末代皇帝，煤山自缢殉国', parents: ['changluo'], emblem: 'mianguan', gender: 'm',
+    life: [1611, 1644],
+    special: '崇祯十七年（1644）李自成攻破北京，帝自缢于煤山，北京陷落后南方诸藩相继称帝拥立，明朝分裂为多支南明政权。',
+    story: '即位后铲除魏忠贤阉党，励精图治，却已无力回天：内有连年天灾与农民起义，外有后金（清）步步紧逼，国库空虚、党争不休。崇祯十七年（1644）三月，李自成攻破北京，帝于煤山（今景山）自缢殉国，年三十四岁，明朝对全国的统治宣告终结。此后福王、唐王、桂王等宗室藩王在南方相继称帝监国，史称"南明"，又延续了近二十年的抵抗。'
+  },
+  yousong: {
+    branches: ['nanming'], zh: '朱由崧', title: '弘光帝', dates: '在位 1644–1645',
+    role: '南明第一位皇帝，福王世子', parents: ['changxun'], emblem: 'mianguan', gender: 'm',
+    life: [1607, 1646],
+    deposed: true,
+    special: '崇祯殉国后由南京诸臣拥立即位，次年清军南下，弘光帝被俘，政权仅存一年。',
+    story: '福王朱常洵之子，崇祯殉国后在马士英、史可法等南京旧臣拥立下即位，改元弘光，是南明第一个政权。朝中党争激烈、军政腐败，清军南下后，弘光元年（1645）五月南京陷落，弘光帝出逃被俘，次年被杀于北京。'
+  },
+  youlang: {
+    branches: ['nanming'], zh: '朱由榔', title: '永历帝', dates: '在位 1646–1662',
+    role: '南明最后一位皇帝，抗清时间最长', parents: ['changying'], emblem: 'mianguan', gender: 'm',
+    life: [1623, 1662],
+    deposed: true,
+    special: '隆武帝殉国后由广西诸臣拥立，是南明存续时间最长的政权，最终逃入缅甸后被吴三桂缢杀。',
+    story: '桂王朱常瀛之子，隆武帝在福建殉国后于广东肇庆被拥立监国继而称帝，改元永历，与广州拥立的绍武政权一度互相攻伐、史称"唐桂争立"。此后辗转广西、云南，一度联合大西军余部坚持抗清十余年，是南明存续最久的政权。永历十五年（1661）逃入缅甸，次年被吴三桂缢杀于昆明，南明政权至此基本终结。'
+  },
+
+  tang_ya: {
+    branches: ['fanwang'], zh: '唐藩历代', title: '朱桱→朱宇温→朱宙栐', dates: '约1415–约1580',
+    role: '唐藩世系压缩节点', parents: ['gang'], emblem: 'queque', gender: 'group', compressed: true,
+    note: '自唐定王朱桱之后，唐藩历经数代方传至朱聿键一支的直系祖先——唐敬王朱宇温、唐顺王朱宙栐——此处压缩为一个节点。宗藩支系的世代更替往往快于皇统本支（不受政务羁绊、成婚生育更早），因此唐藩虽早在洪武年间始封，其后裔朱聿键在世时却已与崇祯帝大体同期，这也是本谱系中"世代行序"与"历法纪年"出现错位的典型例证。此段中间世代的具体人数与在位年份，本谱系未逐一考订，请以《明史·诸王世表》为准。'
+  },
+  shuohuang: {
+    branches: ['fanwang'], zh: '朱硕熿', title: '唐端王', dates: '生卒不详',
+    role: '朱聿键祖父', parents: ['tang_ya'], emblem: 'panchi', gender: 'm',
+    life: [null, null],
+    note: '生卒年份检索未得确证，此处存疑，不作具体年份标注。'
+  },
+  qishu: {
+    branches: ['fanwang'], zh: '朱器墭', title: '追封唐裕王（宣皇帝）', dates: '生卒不详',
+    role: '朱聿键之父，未及袭爵而卒', parents: ['shuohuang'], emblem: 'paiwei', gender: 'm',
+    life: [null, null],
+    posthumous: true,
+    note: '未及正式袭封唐王便已去世（具体年份检索未得确证），隆武帝即位后追尊其父四代，朱器墭被追尊为"宣皇帝"。'
+  },
+  yujian_tang: {
+    branches: ['nanming'], zh: '朱聿键', title: '隆武帝', dates: '在位 1645–1646',
+    role: '南明第二位皇帝，唐定王八世孙', parents: ['qishu'], emblem: 'mianguan', gender: 'm',
+    life: [1602, 1646],
+    deposed: true,
+    special: '弘光政权覆灭后由郑芝龙、黄道周等拥立于福州，是唐藩自太祖朝始封二百三十年后重新登上皇位的宗支。',
+    story: '唐定王朱桱八世孙，弘光政权覆灭后，郑芝龙、黄道周等在福州拥立其称帝，改元隆武，是南明较有作为的一位皇帝，力主联合各方抗清、整顿吏治。但实权始终掌握在郑芝龙手中，隆武二年（1646）郑芝龙降清、清军长驱直入福建，隆武帝在汀州被俘殉国。'
+  },
+  yuyue: {
+    branches: ['nanming'], zh: '朱聿𨮁', title: '绍武帝', dates: '在位 1646–1647',
+    role: '隆武帝之弟，在位仅四十余日', parents: ['qishu'], emblem: 'mianguan', gender: 'm',
+    life: [1605, 1647],
+    deposed: true,
+    special: '隆武帝殉国后，由苏观生等在广州仓促拥立，与肇庆的永历政权同时并立、互相攻伐，史称"唐桂争立"。',
+    story: '隆武帝之弟，隆武帝殉国后逃至广州，被大学士苏观生等拥立称帝，改元绍武，与几乎同时在肇庆称帝的永历政权爆发内战。政权仅存四十余日，清军攻入广州后自缢而死，是南明诸帝中在位时间最短的一位——两支本应联手抗清的宗室力量，却在存亡关头彼此相争。'
+  },
+
+  lu_ya: {
+    branches: ['fanwang'], zh: '鲁藩历代', title: '朱肇煇→朱泰堪→……', dates: '约1403–约1580',
+    role: '鲁藩世系压缩节点', parents: ['tan'], emblem: 'queque', gender: 'group', compressed: true,
+    note: '自鲁荒王朱檀之后，鲁藩历经数代方传至朱以海一支的直系祖先——包括第二代鲁靖王朱肇煇、第三代鲁惠王朱泰堪等——此处压缩为一个节点。鲁藩世系自1370年首封至1662年朱以海病逝于金门，延续近三百年、贯穿整个明朝始终未曾中断，是明代诸藩王世系中颇为独特的一支。此段中间世代的具体人数与在位年份，本谱系未逐一考订，请以《明史·诸王世表》为准。'
+  },
+  yitan: {
+    branches: ['fanwang'], zh: '朱颐坦', title: '鲁恭王', dates: '生卒不详',
+    role: '朱以海祖父', parents: ['lu_ya'], emblem: 'panchi', gender: 'm',
+    life: [null, null],
+    note: '生卒年份检索未得确证，此处存疑，不作具体年份标注。'
+  },
+  shouyong: {
+    branches: ['fanwang'], zh: '朱寿镛', title: '鲁肃王', dates: '?–1639',
+    role: '朱以海之父，因兄长无嗣而袭封', parents: ['yitan'], emblem: 'panchi', gender: 'm',
+    life: [null, 1639],
+    note: '因七兄鲁宪王朱寿鋐死后无嗣，崇祯九年（1636）以弟继兄之位袭封鲁王——鲁藩内部也曾发生过与皇统本支相似的"兄终弟及"。'
+  },
+  yipai: {
+    branches: ['fanwang'], zh: '朱以派', title: '鲁安王', dates: '?–1642',
+    role: '朱以海之兄，殉国而未及传位', parents: ['shouyong'], emblem: 'panchi', gender: 'm',
+    life: [null, 1642],
+    note: '崇祯十五年（1642）清军攻破兖州，与长子及两位弟弟同日殉难，鲁王之位由六弟朱以海承继。'
+  },
+  yihai: {
+    branches: ['nanming'], zh: '朱以海', title: '鲁监国', dates: '监国 1645–1653',
+    role: '鲁荒王九世孙，终身未称帝、以监国身份坚持抗清', parents: ['shouyong'], emblem: 'yin', gender: 'm',
+    life: [1618, 1662],
+    special: '兄长朱以派殉国后袭封鲁王，崇祯殉国次年在绍兴自称"监国"，始终未正式称帝，与隆武、永历政权关系微妙，一度因称呼礼节问题触怒隆武帝。',
+    story: '鲁荒王朱檀九世孙、鲁肃王朱寿镛第六子。兄长鲁安王朱以派于清军破兖州时殉国，以海南逃袭封鲁王。弘光政权覆灭后，在浙东旧臣拥戴下于绍兴监国，始终未接受"皇帝"尊号，与几乎同期称帝的隆武政权关系紧张。此后辗转舟山、厦门、金门，晚年依附郑成功，1653年取消监国名义，1662年病逝于金门，是南明抵抗力量中坚持时间较长、下场相对平静的一支。'
+  },
+
+  chang_shi: {
+    branches: ['jianwen'], zh: '常氏', title: '懿文太子妃', dates: '?–1391',
+    role: '开平王常遇春之女，朱雄英、朱允熥之母', parents: [], emblem: 'fenghuang', gender: 'f',
+    life: [null, 1391],
+    note: '朱标元妃，早于朱标本人去世；其父常遇春是随太祖开国的头号猛将之一。'
+  },
+  lv_shi: {
+    branches: ['jianwen'], zh: '吕氏', title: '懿文太子继妃', dates: '生卒不详',
+    role: '朱允炆生母，常氏去世后扶正为太子继妃', parents: [], emblem: 'zan', gender: 'f',
+    life: [null, null],
+    note: '建文帝即位后尊为皇太后；靖难之役后地位不详，史料记载语焉不详。'
+  },
+  zhang_huanghou: {
+    branches: ['main'], zh: '张皇后', title: '诚孝昭皇后', dates: '?–1442',
+    role: '仁宗皇后，历经洪熙、宣德、正统三朝', parents: [], emblem: 'fenghuang', gender: 'f',
+    life: [null, 1442],
+    note: '朱瞻基生母。仁宗早逝、宣宗英年而终后，两度以太后／太皇太后身份主持大局、稳定朝局，是明代前期宫廷中少见的实际掌权女性。'
+  },
+  qian_huanghou: {
+    branches: ['main'], zh: '钱皇后', title: '孝庄睿皇后', dates: '?–1468',
+    role: '英宗皇后，以对丈夫的忠贞闻名', parents: [], emblem: 'fenghuang', gender: 'f',
+    life: [null, 1468],
+    note: '土木之变英宗被俘期间，她日夜哭泣祈祷、哭瞎一目、跪拜致跛一足，变卖宫中物品筹措赎金；英宗复位后感念其情，临终遗命必与其合葬，为此与朝臣一度僵持。'
+  },
+  wan_guifei: {
+    branches: ['main'], zh: '万贵妃', title: '恭肃端慎荣靖皇贵妃', dates: '1428–1487',
+    role: '宪宗宠妃，年长宪宗十七岁', parents: [], emblem: 'zan', gender: 'f',
+    life: [1428, 1487],
+    note: '自宪宗年幼时便贴身照料，即位后独宠后宫二十余年，权势煊赫，是成化一朝宫闱政治中绕不开的人物。'
+  },
+  zhou_huanghou: {
+    branches: ['main'], zh: '周皇后', title: '孝节烈皇后', dates: '?–1644',
+    role: '思宗皇后，北京城破之日自缢殉国', parents: [], emblem: 'fenghuang', gender: 'f',
+    life: [null, 1644],
+    note: '崇祯十七年（1644）三月，李自成攻入北京前夕，周皇后于坤宁宫自缢，早于崇祯帝殉国。'
+  }
+};
+
+/* ---------- 结合关系：仅收录本谱系明确建模的正配/重要宠妃 ----------
+   多数皇子的生母（尤其低阶嫔妃）未单独建模为节点，其子女在 PEOPLE.parents
+   中仅记录父亲一方（单亲血缘线），与希腊神谱对单亲诞育的处理方式一致。 */
+const UNIONS = [
+  { a: 'yuanzhang', b: 'mahuanghou', type: 'marriage' },
+  { a: 'di', b: 'xuhuanghou', type: 'marriage' },
+  { a: 'zhanji', b: 'sun_taihou', type: 'marriage' },
+  { a: 'yijun', b: 'zheng_guifei', type: 'union' },
+  { a: 'biao', b: 'chang_shi', type: 'marriage' },
+  { a: 'biao', b: 'lv_shi', type: 'union' },
+  { a: 'gaozhi', b: 'zhang_huanghou', type: 'marriage' },
+  { a: 'qizhen', b: 'qian_huanghou', type: 'marriage' },
+  { a: 'jianshen', b: 'wan_guifei', type: 'union' },
+  { a: 'youjian', b: 'zhou_huanghou', type: 'marriage' }
+];
+
+/* ---------- 世代行序 ----------
+   行号大体对应"与开国皇帝相隔的代数"，但唐藩、鲁藩两处压缩宗支为保证
+   南明诸帝与崇祯朝落在同一视觉行（体现"大体同期"），有意让其压缩节点
+   之后的行进跨度大于其真实血缘代数——这是"世代行序"服从"史事可读性"
+   的一处刻意取舍，并非计算错误，说明见 tang_ya / lu_ya 详情。
+   每项 [id, 列号, 纵向偏移?]，列号可为小数以便精细对齐；同代内按家庭
+   自然聚拢，不强行按分支分栏。 */
+const ROWS = [
+  /* 第 0 行 · 序章 */
+  [['zuzong4', 6.3]],
+  /* 第 1 行 · 开国 */
+  [['yuanzhang', 6.3], ['mahuanghou', 7.6]],
+  /* 第 2 行 · 太祖诸子（建文源头 / 永乐 / 鲁藩唐藩始封） */
+  [['lv_shi', 0.6], ['biao', 2], ['chang_shi', 3.6], ['di', 6.3], ['xuhuanghou', 7.6], ['tan', 11], ['gang', 13.6]],
+  /* 第 3 行 · 建文三子 / 成祖三子 / 唐藩鲁藩压缩节点 */
+  [['yunwen', 0.6], ['xiongying', 1.7], ['yuntun', 2.8],
+   ['gaozhi', 6.3], ['zhang_huanghou', 4.9], ['gaoxu', 7.6], ['gaosui', 8.8],
+   ['lu_ya', 11], ['tang_ya', 13.6]],
+  /* 第 4 行 · 仁宗诸子 */
+  [['zhanshan', 5], ['zhanji', 6.6], ['sun_taihou', 7.9]],
+  /* 第 5 行 · 正统 / 景泰 */
+  [['qian_huanghou', 5.2], ['qizhen', 6.6], ['qiyu', 7.9]],
+  /* 第 6 行 · 成化；唐藩鲁藩压缩节点之后的第一处"着陆" */
+  [['jianshen', 6.9], ['wan_guifei', 8.3], ['yitan', 11.3], ['shuohuang', 13.9]],
+  /* 第 7 行 · 弘治 / 兴献王分叉 */
+  [['youtang', 5.9], ['youyuan', 7.9], ['shouyong', 11.3], ['qishu', 13.9]],
+  /* 第 8 行 · 正德 / 嘉靖（兴王入继） */
+  [['houzhao', 5.9], ['houcong', 7.9]],
+  /* 第 9 行 · 隆庆 */
+  [['zaiji', 6.9]],
+  /* 第 10 行 · 万历 */
+  [['yijun', 6.9], ['zheng_guifei', 8.3]],
+  /* 第 11 行 · 万历诸子分叉（国本之争） */
+  [['changluo', 5.9], ['changxun', 7.9], ['changying', 9.6]],
+  /* 第 12 行 · 明末与南明分裂——主干、福藩、桂藩、唐藩、鲁藩在此同一行汇合 */
+  [['youxiao', 5.2], ['youjian', 6.2], ['zhou_huanghou', 6.85, -85], ['yousong', 7.9], ['youlang', 9.6],
+   ['yipai', 11.3], ['yihai', 12.6], ['yujian_tang', 14.3], ['yuyue', 15.6]]
+];
+
+/* ---------- 事件连线：非父子继承的皇位/监国转移 ----------
+   独立于 PEOPLE.parents 血缘关系之外的第二套"关系图"，每项表示一次
+   具体的历史事件而非生育关系；type 决定连线的颜色、虚实与箭头样式：
+     transfer   非直系 / 非常规继统（红金色实线箭头）
+     restore    复位（朱红虚线回环箭头，与其对应的 transfer 反向弯曲）
+     fraternal  兄终弟及但属和平交接（细金色虚线，不强调"权力斗争"感） */
+const EVENTS = [
+  { from: 'yunwen', to: 'di', type: 'transfer', label: '靖难之役', year: '1399–1402',
+    desc: '建文帝削藩，燕王朱棣以"清君侧"为名起兵，历时三年攻入南京，建文帝下落不明，朱棣自立为帝。' },
+  { from: 'qizhen', to: 'qiyu', type: 'transfer', label: '土木之变 · 郕王监国', year: '1449',
+    desc: '英宗亲征瓦剌于土木堡兵败被俘，皇太后诏命郕王朱祁钰监国，旋即称帝，遥尊英宗为太上皇。' },
+  { from: 'qiyu', to: 'qizhen', type: 'restore', label: '夺门之变 · 英宗复位', year: '1457',
+    desc: '代宗病重，武清侯石亨等拥立幽禁南宫的英宗复辟，改元天顺，代宗随即被废，不久去世。' },
+  { from: 'houzhao', to: 'houcong', type: 'transfer', label: '兴王入继大统', year: '1521',
+    desc: '正德帝无嗣而终，援引《皇明祖训》"兄终弟及"条文，由堂弟、兴献王世子朱厚熜入继大统。' },
+  { from: 'youxiao', to: 'youjian', type: 'fraternal', label: '兄终弟及', year: '1627',
+    desc: '天启帝落水染疾、诸子皆殇，遗诏传位于弟信王朱由检，是明代最后一次和平的兄终弟及。' },
+  { from: 'youjian', to: 'yousong', type: 'transfer', label: '甲申之变后拥立', year: '1644',
+    desc: '李自成攻破北京，崇祯帝自缢，南京诸臣拥立福王世子朱由崧即位，建立南明第一个政权弘光。' },
+  { from: 'youjian', to: 'yihai', type: 'transfer', label: '甲申之变后监国', year: '1645',
+    desc: '北京陷落次年，浙东旧臣拥戴鲁王朱以海于绍兴监国，与南京的弘光政权彼此独立、并未统属。' },
+  { from: 'yousong', to: 'yujian_tang', type: 'transfer', label: '弘光败亡后拥立', year: '1645',
+    desc: '弘光政权覆灭，郑芝龙、黄道周等在福州拥立唐王朱聿键称帝，改元隆武。' },
+  { from: 'yujian_tang', to: 'yuyue', type: 'transfer', label: '隆武殉国后拥立', year: '1646',
+    desc: '隆武帝在汀州被俘殉国，苏观生等在广州拥立其弟朱聿𨮁称帝，改元绍武。' },
+  { from: 'yujian_tang', to: 'youlang', type: 'transfer', label: '隆武殉国后拥立', year: '1646',
+    desc: '与绍武政权几乎同时，广西肇庆诸臣拥立桂王朱由榔监国继而称帝，改元永历；两支政权一度互相攻伐，史称"唐桂争立"。' }
+];
+
+/* =========================================================
+   世代背景标签
+   ========================================================= */
+const GEN_LABELS = [
+  '序章', '第一代', '第二代', '第三代', '第四代', '第五代', '第六代',
+  '第七代', '第八代', '第九代', '第十代', '第十一代', '第十二代'
+];
+
+/* =========================================================
+   布局常量与坐标计算（与原希腊神谱页面完全同构的纯几何逻辑，
+   不涉及人物关系数据本身，故照搬复用）
+   ========================================================= */
+const COL = 168;
+const LEFT_PAD = 70;
+const ROW_Y = [60, 176, 352, 566, 780, 984, 1188, 1392, 1596, 1800, 2004, 2208, 2412];
+const AVATAR_R = 34;
+const LABEL_CLEAR = 78;
+const TOP_GAP = 52;
+const MIN_COL_GAP = (AVATAR_R * 2 + 26) / COL;
+
+function computePositions() {
+  const pos = {};
+  let maxCol = 0;
+  ROWS.forEach((row, gi) => {
+    let autoCol = 0;
+    const entries = [];
+    row.forEach(entry => {
+      let id, col, yOffset = 0;
+      if (Array.isArray(entry)) {
+        id = entry[0];
+        col = entry.length > 1 && entry[1] !== null ? entry[1] : autoCol;
+        yOffset = entry.length > 2 && entry[2] !== null ? entry[2] : 0;
+      } else {
+        id = entry;
+        col = autoCol;
+      }
+      entries.push({ id, col, yOffset });
+      autoCol = col + 1;
+    });
+
+    const byOffset = {};
+    entries.forEach(e => { (byOffset[e.yOffset] = byOffset[e.yOffset] || []).push(e); });
+    Object.values(byOffset).forEach(group => {
+      group.sort((a, b) => a.col - b.col);
+      group.forEach((e, i) => {
+        e.adjCol = i === 0 ? e.col : Math.max(e.col, group[i - 1].adjCol + MIN_COL_GAP);
+      });
+    });
+
+    entries.forEach(e => {
+      pos[e.id] = { x: LEFT_PAD + (e.adjCol + 0.5) * COL, y: ROW_Y[gi] + e.yOffset, row: gi, col: e.adjCol };
+      if (e.adjCol + 1 > maxCol) maxCol = e.adjCol + 1;
+    });
+  });
+  return { pos, maxCol };
+}
+
+const { pos: POS, maxCol: MAX_COL } = computePositions();
+const CANVAS_W = LEFT_PAD * 2 + MAX_COL * COL;
+const CANVAS_H = ROW_Y[ROW_Y.length - 1] + 340;
+let UNION_ANCHORS = {};
+
+/* ---------- 连线锚点：同代结合（水平）与跨代结合（斜线） ---------- */
+function unionAnchor(u) {
+  const a = POS[u.a], b = POS[u.b];
+  if (!a || !b) return null;
+  if (a.row === b.row) {
+    const left = a.x < b.x ? a : b;
+    const right = a.x < b.x ? b : a;
+    const midX = (a.x + b.x) / 2;
+    return {
+      x: midX, y: a.y,
+      lines: [{
+        from: { x: left.x + AVATAR_R, y: left.y },
+        to: { x: right.x - AVATAR_R, y: right.y },
+        style: 'horizontal'
+      }]
+    };
+  }
+  const lower = a.y > b.y ? a : b;
+  const higher = a.y > b.y ? b : a;
+  const anchor = { x: (a.x + b.x) / 2, y: lower.y };
+  const startX = higher.x;
+  const startY = higher.y + LABEL_CLEAR;
+  return {
+    x: anchor.x, y: anchor.y,
+    lines: [{ from: { x: startX, y: startY }, to: anchor, style: 'diagonal' }]
+  };
+}
+
+/* ---------- 血缘连线路径：标准竖向 S 形贝塞尔曲线 ----------
+   与此前版本使用完全相同的三次贝塞尔连接方式，这里只是把控制点计算
+   拆成独立函数，便于在"跨多代压缩"的连线上另外取点、加密标记，
+   连线本身的几何算法与走向未作任何改变。 */
+function bloodControlPoints(parentX, parentYRow, childX, childYRow) {
+  const y1 = parentYRow + LABEL_CLEAR;
+  const y2 = childYRow - TOP_GAP;
+  const midY = (y1 + y2) / 2;
+  return {
+    p0: { x: parentX, y: y1 },
+    p1: { x: parentX, y: midY },
+    p2: { x: childX, y: midY },
+    p3: { x: childX, y: y2 }
+  };
+}
+
+function bloodPathD(parentX, parentYRow, childX, childYRow) {
+  const c = bloodControlPoints(parentX, parentYRow, childX, childYRow);
+  return `M ${c.p0.x} ${c.p0.y} C ${c.p1.x} ${c.p1.y}, ${c.p2.x} ${c.p2.y}, ${c.p3.x} ${c.p3.y}`;
+}
+
+function cubicBezierPoint(p0, p1, p2, p3, t) {
+  const mt = 1 - t;
+  const a = mt * mt * mt, b = 3 * mt * mt * t, c = 3 * mt * t * t, d = t * t * t;
+  return {
+    x: a * p0.x + b * p1.x + c * p2.x + d * p3.x,
+    y: a * p0.y + b * p1.y + c * p2.y + d * p3.y
+  };
+}
+
+/* 沿血缘曲线均匀取点，标出"这一段压缩了几代人"——每跨过一代放一个
+   淡金色小圆点，视线扫过长连线时能感知到中间被省略的世系，而不是
+   一条空荡荡的长直线。仅用于跨度 > 1 代的连线（多数正常父子连线
+   跨度恰为 1 代，不会出现标记点，观感与此前完全一致）。 */
+function bloodSkipMarkers(parentX, parentYRow, childX, childYRow, rowSpan) {
+  if (rowSpan <= 1) return [];
+  const c = bloodControlPoints(parentX, parentYRow, childX, childYRow);
+  const n = rowSpan - 1;
+  const pts = [];
+  for (let i = 1; i <= n; i++) {
+    const t = i / rowSpan;
+    pts.push(cubicBezierPoint(c.p0, c.p1, c.p2, c.p3, t));
+  }
+  return pts;
+}
+
+/* ---------- 事件连线路径：与血缘线共用坐标系，但允许同代弧线 /
+   跨代上行弧线，用于表达"权力从谁转向了谁"而非"谁生了谁"。
+   bend 控制同代事件的弧线弯曲方向：默认向下弯曲（1），复位类事件
+   传入 -1 使其向上弯曲，与其对应的去向事件线在视觉上区分、不重叠。 ---------- */
+function eventPathD(fromId, toId, bend) {
+  const a = POS[fromId], b = POS[toId];
+  if (!a || !b) return null;
+  bend = bend || 1;
+  const dx = b.x - a.x, dy = b.y - a.y;
+  const dist = Math.hypot(dx, dy) || 1;
+  const ux = dx / dist, uy = dy / dist;
+  const startX = a.x + ux * (AVATAR_R + 14), startY = a.y + uy * (AVATAR_R + 14);
+  const endX = b.x - ux * (AVATAR_R + 19), endY = b.y - uy * (AVATAR_R + 19);
+
+  if (a.row === b.row) {
+    // 同代事件线：原先用二次贝塞尔（唯一控制点在正中央），弧线只在
+    // 正中点达到最大弯曲深度，越靠近两端越贴近该代的头像高度——
+    // 跨越多个同代人物时very容易从别人头像中间穿过去。
+    // 改为三次贝塞尔、两个控制点都取满弯曲深度、分别放在25%/75%
+    // 位置，让弧线尽快下潜到安全高度并在中段保持住，两端才收回来，
+    // 从而稳定避开沿途所有同代头像，而不只是躲开正中间那一个。
+    const dist = Math.abs(endX - startX);
+    const sweep = Math.max(60, Math.min(260, dist * 0.26)) * bend;
+    const midY = a.y + sweep;
+    const cp1X = startX + (endX - startX) * 0.28;
+    const cp2X = startX + (endX - startX) * 0.72;
+    return {
+      d: `M ${startX} ${startY} C ${cp1X} ${midY}, ${cp2X} ${midY}, ${endX} ${endY}`,
+      labelX: (startX + endX) / 2,
+      labelY: midY - (bend > 0 ? -15 : 9)
+    };
+  }
+  // 跨代事件线：不再假设连线以纵向为主。原来的控制点写法让曲线被迫
+  // 在起止点附近沿纵向离开/到达（血缘线那种"纵向S形"），但靖难之役
+  // 这类事件常常横向跨度远大于纵向（隔代却跨了五六列），纵向起步
+  // 会在起点附近拉出一个不自然的钩状弯曲。改为沿"起止点连线的垂直
+  // 方向"做偏移，弧线弯曲方向由两点连线本身决定，不再预设纵横比例。
+  // 跨代事件线：不再假设连线以纵向为主，也不用"垂直于连线方向"的
+  // 偏移——那种写法虽然消除了钩状回环，但遇到起点旁边紧挨着好几个
+  // 同代兄弟（比如靖难之役里朱允炆身边的朱雄英、朱允熥）时，偏移方向
+  // 可能恰好扫过他们的头像。改为固定"向下（或向上，取决于 bend）沉
+  // 一段"，不跟随连线自身斜率——弧线在整个中段都稳定沉到该代头像
+  // 下方再绕过去，而不只是在正中点达到最大偏移，起点附近也不会
+  // 贴着同代邻居擦过。
+  // 跨代事件线：起点、终点所在的两代往往都有紧邻的其他人物（靖难之役
+  // 里，朱允炆身边有兄弟朱雄英/朱允熥，朱棣所在这一代旁边又有父亲
+  // 朱元璋一支、继母常氏/吕氏），单纯让曲线加速爬升或下沉只能避开
+  // 其中一头。改为让曲线整体拱到"起点行与终点行中更高的那一行"还要
+  // 更高的位置，用一段扁平的拱形从上方绕过去，两端再各自收回到实际
+  // 头像边缘——这样无论中途经过哪一代，都稳定留在该代头像上方。
+  // 跨代事件线：单段拱形若要同时越过起点行（朱允炆身边的兄弟、正
+  // 上方的生母吕氏）和终点行（朱棣旁边的朱标一支），拱顶会被迫顶到
+  // 画布最上方，显得夸张失衡。朱允炆恰好是所在世代最左侧的人物，
+  // 左下方是真正的空白区域——改为两段式路径：先甩向左下方空地，
+  // 避开正上方的吕氏与右侧的兄弟们，再从那片空地大幅扫向朱棣，
+  // 比强行从所有人头顶飞过去更自然、幅度也更克制。
+  // 跨代事件线：靖难之役这类连接横向跨度远大于纵向、且起止点两端
+  // 各自紧邻好几位家人，单一公式化的偏移很容易在某一头留下死角。
+  // 这组控制点参数（拱顶高度、两个控制点的水平位置）经过穷举网格
+  // 搜索确认：与沿途所有其它人物头像保持 100px 以上间距，且曲线
+  // 沿主方向的投影严格单调，不会出现钩状回环。
+  const peakY = Math.min(a.y, b.y) - Math.max(180, Math.min(280, dist * 0.26));
+  const cp1X = startX + (endX - startX) * 0.08;
+  const cp2X = startX + (endX - startX) * 0.52;
+  return {
+    d: `M ${startX} ${startY} C ${cp1X} ${peakY}, ${cp2X} ${peakY}, ${endX} ${endY}`,
+    labelX: (startX + endX) / 2,
+    labelY: peakY - 14
+  };
+}
+
+function renderGenBands() {
+  const box = document.getElementById('genBands');
+  box.style.width = CANVAS_W + 'px';
+  box.style.height = CANVAS_H + 'px';
+
+  const bounds = ROW_Y.map((y, i) => {
+    const top = i === 0 ? 0 : (ROW_Y[i - 1] + y) / 2;
+    const bottom = i === ROW_Y.length - 1 ? CANVAS_H : (y + ROW_Y[i + 1]) / 2;
+    return { top, bottom };
+  });
+
+  box.innerHTML = bounds.map((b, i) =>
+    `<div class="gen-band" style="top:${b.top}px; height:${b.bottom - b.top}px; width:${CANVAS_W}px;"></div>
+     <span class="gen-band-label" style="top:${b.top + 8}px;">${GEN_LABELS[i] || ('第 ' + i + ' 代')}</span>`
+  ).join('');
+}
+
+/* =========================================================
+   SVG 渲染：血缘 / 结合连线层
+   ========================================================= */
+function renderConnectors() {
+  const svg = document.getElementById('connectors');
+  svg.setAttribute('width', CANVAS_W);
+  svg.setAttribute('height', CANVAS_H);
+  svg.setAttribute('viewBox', `0 0 ${CANVAS_W} ${CANVAS_H}`);
+
+  const flowSvg = document.getElementById('flowLayer');
+  flowSvg.setAttribute('width', CANVAS_W);
+  flowSvg.setAttribute('height', CANVAS_H);
+  flowSvg.setAttribute('viewBox', `0 0 ${CANVAS_W} ${CANVAS_H}`);
+
+  const parts = [];
+
+  const unionAnchors = UNION_ANCHORS;
+  Object.keys(unionAnchors).forEach(k => delete unionAnchors[k]);
+  UNIONS.forEach(u => {
+    const anc = unionAnchor(u);
+    if (!anc) return;
+    anc.lines.forEach(ln => {
+      parts.push(`<path class="line-union" data-a="${u.a}" data-b="${u.b}" d="M ${ln.from.x} ${ln.from.y} L ${ln.to.x} ${ln.to.y}"/>`);
+    });
+    parts.push(`<circle class="union-marker" data-a="${u.a}" data-b="${u.b}" cx="${anc.x}" cy="${anc.y}" r="3.2"/>`);
+    unionAnchors[u.a + '|' + u.b] = anc;
+    unionAnchors[u.b + '|' + u.a] = anc;
+  });
+
+  Object.entries(PEOPLE).forEach(([id, p]) => {
+    if (!p.parents || p.parents.length === 0) return;
+    const child = POS[id];
+    if (!child) return;
+    const cls = p.special ? 'line-special' : 'line-blood';
+
+    if (p.parents.length === 1) {
+      const par = POS[p.parents[0]];
+      if (!par) return;
+      const d = bloodPathD(par.x, par.y, child.x, child.y);
+      parts.push(`<path class="${cls}" data-child="${id}" data-parents="${p.parents.join(',')}" d="${d}"/>`);
+      const rowSpan = child.row - par.row;
+      bloodSkipMarkers(par.x, par.y, child.x, child.y, rowSpan).forEach(pt => {
+        parts.push(`<circle class="skip-marker ${cls}" data-child="${id}" data-parents="${p.parents.join(',')}" cx="${pt.x}" cy="${pt.y}" r="2.1"/>`);
+      });
+    } else {
+      const key = p.parents[0] + '|' + p.parents[1];
+      const anc = unionAnchors[key];
+      let originX, originY, originRow;
+      if (anc) {
+        originX = anc.x; originY = anc.y; originRow = Math.max(POS[p.parents[0]].row, POS[p.parents[1]].row);
+      } else {
+        const a = POS[p.parents[0]], b = POS[p.parents[1]];
+        if (!a || !b) return;
+        originX = (a.x + b.x) / 2; originY = Math.max(a.y, b.y); originRow = Math.max(a.row, b.row);
+      }
+      const d = bloodPathD(originX, originY, child.x, child.y);
+      parts.push(`<path class="${cls}" data-child="${id}" data-parents="${p.parents.join(',')}" d="${d}"/>`);
+      const rowSpan = child.row - originRow;
+      bloodSkipMarkers(originX, originY, child.x, child.y, rowSpan).forEach(pt => {
+        parts.push(`<circle class="skip-marker ${cls}" data-child="${id}" data-parents="${p.parents.join(',')}" cx="${pt.x}" cy="${pt.y}" r="2.1"/>`);
+      });
+    }
+  });
+
+  svg.innerHTML = parts.join('');
+}
+
+/* =========================================================
+   SVG 渲染：事件连线层（靖难 · 夺门 · 兴王入继 · 南明拥立……）
+   ========================================================= */
+function renderEventConnectors() {
+  const svg = document.getElementById('events');
+  svg.setAttribute('width', CANVAS_W);
+  svg.setAttribute('height', CANVAS_H);
+  svg.setAttribute('viewBox', `0 0 ${CANVAS_W} ${CANVAS_H}`);
+
+  const defs = svg.querySelector('defs');
+  const parts = [];
+
+  EVENTS.forEach((ev, i) => {
+    const bend = ev.type === 'restore' ? -1 : 1;
+    const path = eventPathD(ev.from, ev.to, bend);
+    if (!path) return;
+    const cls = ev.type === 'restore' ? 'line-restore' : ev.type === 'fraternal' ? 'line-fraternal' : 'line-transfer';
+    parts.push(`<path class="${cls}" data-from="${ev.from}" data-to="${ev.to}" data-event="${i}" d="${path.d}"/>`);
+    parts.push(`<text class="event-label" data-from="${ev.from}" data-to="${ev.to}" data-event="${i}" x="${path.labelX}" y="${path.labelY}" text-anchor="middle">${ev.label}</text>`);
+  });
+
+  svg.innerHTML = '';
+  if (defs) svg.appendChild(defs);
+  const frag = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  frag.innerHTML = parts.join('');
+  while (frag.firstChild) svg.appendChild(frag.firstChild);
+}
+
+/* =========================================================
+   节点渲染
+   ========================================================= */
+const GENDER_SYMBOL = { m: '\u2642', f: '\u2640' };
+const GENDER_WORD    = { m: '男', f: '女' };
+
+function nodeLabel(id) {
+  const p = PEOPLE[id];
+  const genderTxt = GENDER_WORD[p.gender] ? `，${GENDER_WORD[p.gender]}` : '';
+  return `${p.zh}，${p.title}${genderTxt}，${p.role}`;
+}
+
+function genderBadgeHTML(p) {
+  const sym = GENDER_SYMBOL[p.gender];
+  if (!sym) return '';
+  const cls = p.gender === 'm' ? 'male' : 'female';
+  return `<span class="gender-badge ${cls}" aria-hidden="true">${sym}</span>`;
+}
+
+function renderNodes() {
+  const layer = document.getElementById('nodes');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const html = [];
+
+  ROWS.forEach((row, gi) => {
+    row.forEach((entry, idx) => {
+      const id = Array.isArray(entry) ? entry[0] : entry;
+      const p = PEOPLE[id];
+      const pos = POS[id];
+      if (!p || !pos) return;
+      const emblem = EMBLEMS[p.emblem] || EMBLEMS.default;
+      const statusCls = [
+        p.posthumous ? 'posthumous' : '',
+        p.deposed ? 'deposed' : '',
+        p.compressed ? 'compressed' : ''
+      ].filter(Boolean).join(' ');
+      const delay = reducedMotion ? '' : `style="left:${pos.x}px; top:${pos.y}px; animation-delay:${(gi * 0.1 + idx * 0.02).toFixed(2)}s"`;
+      const style = reducedMotion ? `style="left:${pos.x}px; top:${pos.y}px"` : delay;
+      const enterCls = reducedMotion ? '' : ' enter';
+
+      html.push(`
+        <button class="node${enterCls}" data-id="${id}" ${style} aria-label="${nodeLabel(id)}">
+          <span class="avatar${statusCls ? ' ' + statusCls : ''}">
+            <svg class="emblem" viewBox="0 0 40 40">${emblem}</svg>
+            ${genderBadgeHTML(p)}
+          </span>
+          <span class="node-name-zh">${p.zh}</span>
+          <span class="node-name-era">${p.dates || ''}</span>
+        </button>
+      `);
+    });
+  });
+
+  layer.innerHTML = html.join('');
+}
+
+/* =========================================================
+   交互：关联查找 / 高亮 / 提示框
+   ========================================================= */
+function relatedIds(id) {
+  const rel = new Set();
+  const p = PEOPLE[id];
+  (p.parents || []).forEach(pid => rel.add(pid));
+  UNIONS.forEach(u => {
+    if (u.a === id) rel.add(u.b);
+    if (u.b === id) rel.add(u.a);
+  });
+  Object.entries(PEOPLE).forEach(([cid, cp]) => {
+    if ((cp.parents || []).includes(id)) rel.add(cid);
+  });
+  EVENTS.forEach(ev => {
+    if (ev.from === id) rel.add(ev.to);
+    if (ev.to === id) rel.add(ev.from);
+  });
+  return rel;
+}
+
+// 精确拆分版本：区分父/母/配偶/子女/事件，供详情面板使用
+function relationsOf(id) {
+  const p = PEOPLE[id];
+  const parents = (p.parents || []).map(pid => ({ id: pid, gender: PEOPLE[pid] ? PEOPLE[pid].gender : null }));
+  const spouses = [];
+  UNIONS.forEach(u => {
+    if (u.a === id) spouses.push(u.b);
+    else if (u.b === id) spouses.push(u.a);
+  });
+  const children = [];
+  Object.entries(PEOPLE).forEach(([cid, cp]) => {
+    if ((cp.parents || []).includes(id)) children.push(cid);
+  });
+  const events = EVENTS.filter(ev => ev.from === id || ev.to === id);
+  return { parents, spouses, children, events };
+}
+
+function parentNamesText(p) {
+  if (!p.parents || p.parents.length === 0) return '';
+  if (p.parents.length === 2) {
+    return `父母：${PEOPLE[p.parents[0]].zh}、${PEOPLE[p.parents[1]].zh}`;
+  }
+  const parent = PEOPLE[p.parents[0]];
+  const tag = parent && parent.gender === 'f' ? '母' : (parent && parent.gender === 'm' ? '父' : '亲');
+  return `${tag}：${parent.zh}`;
+}
+
+function buildTooltip(id) {
+  const p = PEOPLE[id];
+  let html = `
+    <div class="tooltip-name"><span class="zh">${p.zh}</span><span class="era">${p.dates || ''}</span></div>
+    <div class="tooltip-role">${p.title}</div>
+  `;
+  const parentsText = parentNamesText(p);
+  if (parentsText) html += `<div class="tooltip-parents">${parentsText}</div>`;
+  const evs = EVENTS.filter(e => e.from === id || e.to === id);
+  if (evs.length) {
+    const ev = evs[0];
+    const mark = ev.to === id ? '← ' : '→ ';
+    html += `<div class="tooltip-special"><span class="mark">※</span> ${mark}${ev.label}（${ev.year}）${evs.length > 1 ? ' 等' + evs.length + '事' : ''}</div>`;
+  } else if (p.special) {
+    html += `<div class="tooltip-special"><span class="mark">※</span> ${p.special}</div>`;
+  }
+  if (p.note) html += `<div class="tooltip-note">${p.note}</div>`;
+  return html;
+}
+
+let pinnedId = null;
+let longPressJustFired = false;
+
+function applyHighlight(id) {
+  const rel = id ? relatedIds(id) : null;
+  const parentIds = id ? (PEOPLE[id].parents || []) : [];
+
+  document.querySelectorAll('.node').forEach(el => {
+    const nid = el.dataset.id;
+    el.classList.toggle('active', nid === id);
+    el.classList.toggle('dimmed', !!id && nid !== id && !rel.has(nid));
+    el.classList.toggle('parent-highlight', parentIds.includes(nid));
+  });
+
+  document.querySelectorAll('#connectors path, #connectors circle').forEach(el => {
+    if (!id) { el.classList.remove('active', 'dimmed'); return; }
+    const a = el.dataset.a, b = el.dataset.b;
+    const child = el.dataset.child, parents = el.dataset.parents ? el.dataset.parents.split(',') : null;
+    const isRelated = (a === id || b === id) || (child === id) || (parents && parents.includes(id));
+    el.classList.toggle('active', isRelated);
+    el.classList.toggle('dimmed', !isRelated);
+  });
+
+  document.querySelectorAll('#events path, #events text').forEach(el => {
+    if (!id) { el.classList.remove('active', 'dimmed'); return; }
+    const from = el.dataset.from, to = el.dataset.to;
+    const isRelated = from === id || to === id;
+    el.classList.toggle('active', isRelated);
+    el.classList.toggle('dimmed', !isRelated);
+  });
+
+  updateFlowPaths(id);
+}
+
+/* ---------- 流光动效：血缘流光（金色）+ 事件流光（朱红色）并存 ---------- */
+const FLOW_DASH = 16, FLOW_GAP = 58;
+const FLOW_CYCLE = (FLOW_DASH + FLOW_GAP) * 10;
+const FLOW_SPEED_PX_S = 90;
+const FLOW_DURATION = (FLOW_CYCLE / FLOW_SPEED_PX_S).toFixed(2) + 's';
+
+function computeAnchorForParents(pa, pb) {
+  const key1 = pa + '|' + pb, key2 = pb + '|' + pa;
+  if (UNION_ANCHORS[key1]) return UNION_ANCHORS[key1];
+  if (UNION_ANCHORS[key2]) return UNION_ANCHORS[key2];
+  const a = POS[pa], b = POS[pb];
+  if (!a || !b) return null;
+  return { x: (a.x + b.x) / 2, y: Math.max(a.y, b.y) };
+}
+
+function buildParentChildFlowPaths(id) {
+  const p = PEOPLE[id];
+  const child = POS[id];
+  if (!p || !child || !p.parents || !p.parents.length) return [];
+
+  if (p.parents.length === 1) {
+    const par = POS[p.parents[0]];
+    if (!par) return [];
+    return [bloodPathD(par.x, par.y, child.x, child.y)];
+  }
+
+  const anc = computeAnchorForParents(p.parents[0], p.parents[1]);
+  if (!anc) return [];
+
+  const y1 = anc.y + LABEL_CLEAR;
+  const bloodD = bloodPathD(anc.x, anc.y, child.x, child.y);
+  const seg2 = bloodD.replace(/^M/, 'L');
+
+  return p.parents.map(parentId => {
+    const originPos = POS[parentId];
+    if (!originPos) return null;
+    const dx = anc.x - originPos.x, dy = anc.y - originPos.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const startX = originPos.x + (dx / dist) * AVATAR_R;
+    const startY = originPos.y + (dy / dist) * AVATAR_R;
+    const seg1 = `M ${startX} ${startY} L ${anc.x} ${anc.y} L ${anc.x} ${y1}`;
+    return seg1 + ' ' + seg2;
+  }).filter(Boolean);
+}
+
+// 找到"指向"该人物的事件连线（他是接手皇位/监国之位的一方），
+// 用独立的朱红流光呈现"权力从谁转向了谁"，与血缘流光同时并存、互不干扰。
+function buildEventFlowPaths(id) {
+  const paths = [];
+  EVENTS.forEach(ev => {
+    if (ev.to !== id) return;
+    const bend = ev.type === 'restore' ? -1 : 1;
+    const path = eventPathD(ev.from, ev.to, bend);
+    if (path) paths.push(path.d);
+  });
+  return paths;
+}
+
+function updateFlowPaths(id) {
+  const flowSvg = document.getElementById('flowLayer');
+  flowSvg.innerHTML = '';
+  if (!id) return;
+
+  const bloodPaths = buildParentChildFlowPaths(id);
+  const eventPaths = buildEventFlowPaths(id);
+  if (!bloodPaths.length && !eventPaths.length) return;
+
+  const isSpecial = !!PEOPLE[id].special;
+  const frag = document.createDocumentFragment();
+
+  function makeFlowGroup(d, extraCls) {
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.setAttribute('class', 'flow-path show' + (extraCls ? ' ' + extraCls : ''));
+    const halo = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    halo.setAttribute('d', d);
+    halo.setAttribute('class', 'flow-halo');
+    halo.style.animationDuration = FLOW_DURATION;
+    const core = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    core.setAttribute('d', d);
+    core.setAttribute('class', 'flow-core');
+    core.style.animationDuration = FLOW_DURATION;
+    group.appendChild(halo);
+    group.appendChild(core);
+    return group;
+  }
+
+  bloodPaths.forEach(d => {
+    const group = makeFlowGroup(d);
+    if (isSpecial) group.querySelector('.flow-core').style.stroke = 'var(--gold2)';
+    frag.appendChild(group);
+  });
+  eventPaths.forEach(d => frag.appendChild(makeFlowGroup(d, 'flow-event')));
+
+  flowSvg.appendChild(frag);
+}
+
+function positionTooltip(id) {
+  const tooltip = document.getElementById('tooltip');
+  const pos = POS[id];
+  tooltip.innerHTML = buildTooltip(id);
+  tooltip.classList.add('show');
+
+  let left = pos.x + 44;
+  let top = pos.y - 20;
+  const tw = 270;
+  if (left + tw > CANVAS_W - 20) left = pos.x - tw - 44;
+  if (top < 10) top = 10;
+
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('tooltip').classList.remove('show');
+}
+
+/* =========================================================
+   详情面板
+   ========================================================= */
+/* ---------- 生卒与终年 ----------
+   life: [出生年份, 死亡年份]，任一项为 null 表示存疑/不可考。
+   终年岁数采用中国传统"虚岁"记法（死亡年 − 出生年 + 1），
+   这也是《明史》一类史料中"享年""终年"惯常采用的计岁方式——
+   与按公历周岁简单相减相比，虚岁通常会多出一岁。
+   两项都明确时才计算，避免在史料存疑处（如建文帝下落不明）
+   编造一个看似精确实则无据的数字。 */
+function lifeSpanText(p) {
+  if (!p.life) return null;
+  const [birth, death] = p.life;
+  if (birth == null && death == null) return null;
+  const b = birth == null ? '?' : birth + '年';
+  const d = death == null ? '?' : death + '年';
+  let ageHtml = '';
+  if (birth != null && death != null) {
+    const age = death - birth + 1;
+    ageHtml = `　<span class="age-mark">终年 ${age} 岁（虚岁）</span>`;
+  }
+  return `${b} – ${d}${ageHtml}`;
+}
+
+function statusLabelOf(p) {
+  if (p.compressed) return '世系压缩节点';
+  if (p.posthumous) return '追尊 · 未曾正式在位';
+  if (p.deposed) return '曾经历废黜、被俘或幽禁';
+  if (p.gender === 'f') return p.emblem === 'fenghuang' ? '皇后 / 太后' : '妃嫔';
+  if (p.title && p.title.includes('监国')) return '监国（未正式称帝）';
+  if (p.title && (p.title.includes('帝') || p.title.includes('宗') || p.title.includes('祖'))) return '皇帝';
+  return '亲王 / 宗室';
+}
+
+function relPersonRow(id, tag, roleText) {
+  const p = PEOPLE[id];
+  if (!p) return '';
+  return `<button class="detail-rel-item" data-goto="${id}" type="button">
+    <span class="rel-tag">${tag}</span><span>${p.zh}</span><span class="rel-role">${roleText || ''}</span>
+  </button>`;
+}
+
+let MING_NAME_PATTERN = null;
+const MING_NAME_TO_ID = {};
+function ensureMingNamePattern() {
+  if (MING_NAME_PATTERN) return;
+  Object.entries(PEOPLE).forEach(([id, p]) => {
+    if (p.compressed) return;
+    MING_NAME_TO_ID[p.zh] = id;
+  });
+  const names = Object.keys(MING_NAME_TO_ID)
+    .sort((a, b) => b.length - a.length)
+    .map(n => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  MING_NAME_PATTERN = new RegExp('(' + names.join('|') + ')', 'g');
+}
+
+function linkifyMing(text, selfId) {
+  if (!text) return '';
+  ensureMingNamePattern();
+  return text.replace(MING_NAME_PATTERN, (match) => {
+    const id = MING_NAME_TO_ID[match];
+    if (!id || id === selfId) return match;
+    return `<span class="myth-link" data-goto="${id}" role="link" tabindex="0">${match}</span>`;
+  });
+}
+
+function buildDetailContent(id) {
+  const p = PEOPLE[id];
+  const rel = relationsOf(id);
+
+  let html = (p.branches || []).map(b => {
+    const meta = BRANCH_META[b];
+    const cls = b === 'nanming' ? ' tag-nanming' : '';
+    return `<span class="detail-branch-tag${cls}">${meta ? meta.label : b}</span>`;
+  }).join('');
+
+  html += `<div class="detail-name"><span class="zh">${p.zh}</span><span class="era">${p.dates || ''}</span></div>`;
+  html += `<div class="detail-title"><span class="title-name">${p.title}</span></div>`;
+  const lifeText = lifeSpanText(p);
+  if (lifeText) html += `<div class="detail-lifespan">${lifeText}</div>`;
+  html += `<div class="detail-role">${p.role}</div>`;
+  html += `<div class="detail-kind">${statusLabelOf(p)}</div>`;
+
+  html += `<div class="detail-section"><div class="detail-section-title">血亲与结合</div><div class="detail-rel-list">`;
+  let relCount = 0;
+  rel.parents.forEach(par => {
+    const pp = PEOPLE[par.id];
+    if (!pp) return;
+    const tag = par.gender === 'f' ? '母' : (par.gender === 'm' ? '父' : '亲');
+    html += relPersonRow(par.id, tag, pp.role);
+    relCount++;
+  });
+  rel.spouses.forEach(sid => {
+    const sp = PEOPLE[sid];
+    if (!sp) return;
+    html += relPersonRow(sid, '配', sp.role);
+    relCount++;
+  });
+  rel.children.forEach(cid => {
+    const cp = PEOPLE[cid];
+    if (!cp) return;
+    const tag = cp.gender === 'f' ? '女' : '子';
+    html += relPersonRow(cid, tag, cp.role);
+    relCount++;
+  });
+  if (relCount === 0) html += `<div class="detail-empty">谱系中未记录直接血亲或结合关系。</div>`;
+  html += `</div></div>`;
+
+  if (rel.events.length) {
+    html += `<div class="detail-section"><div class="detail-section-title">继统 / 监国事件</div><div class="detail-events">`;
+    rel.events.forEach(ev => {
+      const otherId = ev.to === id ? ev.from : ev.to;
+      const other = PEOPLE[otherId];
+      const dir = ev.to === id ? `接掌 ← ${other ? other.zh : ''}` : `转出 → ${other ? other.zh : ''}`;
+      html += `<div class="detail-event-row"><span class="event-year">${ev.year}</span><span>${dir} · ${ev.label}<br>${ev.desc}</span></div>`;
+    });
+    html += `</div></div>`;
+  } else if (p.special) {
+    html += `<div class="detail-section"><div class="detail-section-title">特殊之处</div><div class="detail-special"><span class="mark">※</span> ${p.special}</div></div>`;
+  }
+
+  if (p.story) {
+    html += `<div class="detail-section"><div class="detail-myth-title">史事</div><div class="detail-myth">${linkifyMing(p.story, id)}</div></div>`;
+  }
+
+  if (p.note) {
+    html += `<div class="detail-section"><div class="detail-section-title">备注</div><div class="detail-note-text">${linkifyMing(p.note, id)}</div></div>`;
+  }
+
+  return html;
+}
+
+function openDetailPanel(id) {
+  const overlay = document.getElementById('detailOverlay');
+  const content = document.getElementById('detailContent');
+  content.innerHTML = buildDetailContent(id);
+  content.scrollTop = 0;
+  overlay.classList.add('show');
+  requestAnimationFrame(() => overlay.classList.add('in'));
+  overlay.dataset.currentId = id;
+}
+
+function closeDetailPanel() {
+  const overlay = document.getElementById('detailOverlay');
+  overlay.classList.remove('in');
+  setTimeout(() => { overlay.classList.remove('show'); }, 220);
+}
+
+function initDetailPanel() {
+  const overlay = document.getElementById('detailOverlay');
+  const panel = document.getElementById('detailPanel');
+  const closeBtn = document.getElementById('detailClose');
+
+  closeBtn.addEventListener('click', closeDetailPanel);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeDetailPanel(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('show')) closeDetailPanel();
+  });
+
+  panel.addEventListener('click', (e) => {
+    const gotoEl = e.target.closest('[data-goto]');
+    if (!gotoEl) return;
+    const id = gotoEl.dataset.goto;
+    if (PEOPLE[id]) {
+      openDetailPanel(id);
+      pinnedId = id;
+      applyHighlight(id);
+    }
+  });
+  panel.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const gotoEl = e.target.closest('[data-goto]');
+    if (!gotoEl) return;
+    e.preventDefault();
+    gotoEl.click();
+  });
+}
+
+/* =========================================================
+   交互：悬停 / 点击固定 / 双击聚焦子树 / 长按或右键查看详情
+   ========================================================= */
+let longPressTimer = null;
+function cancelLongPress() {
+  if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+}
+
+function initInteractions() {
+  const nodesLayer = document.getElementById('nodes');
+  let hoverId = null;
+  let touchStartPos = null;
+
+  nodesLayer.addEventListener('pointermove', (e) => {
+    if (longPressTimer && touchStartPos) {
+      const dx = e.clientX - touchStartPos.x, dy = e.clientY - touchStartPos.y;
+      if (Math.hypot(dx, dy) > 10) cancelLongPress();
+    }
+    if (e.pointerType === 'touch') return;
+    const node = e.target.closest('.node');
+    const id = node ? node.dataset.id : null;
+    // 核心保护：不管浏览器内部把鼠标移动拆成多少个子元素间的进出事件，
+    // 这里只关心"当前指针下方对应的节点 id 是否真的变了"——没变就
+    // 直接跳过，不重复触发 44 个节点的高亮重绘与 tooltip 重建。
+    // 这是此前"悬浮时页面闪动"的根本解法。
+    if (id === hoverId) return;
+    hoverId = id;
+    if (!pinnedId) applyHighlight(hoverId);
+    if (hoverId) positionTooltip(hoverId); else hideTooltip();
+  });
+
+  nodesLayer.addEventListener('pointerleave', (e) => {
+    if (e.pointerType === 'touch') return;
+    if (hoverId === null) return;
+    hoverId = null;
+    if (!pinnedId) applyHighlight(null);
+    hideTooltip();
+  });
+
+  nodesLayer.addEventListener('pointerdown', (e) => {
+    const node = e.target.closest('.node');
+    if (!node) return;
+    const id = node.dataset.id;
+
+    if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+      touchStartPos = { x: e.clientX, y: e.clientY };
+      longPressJustFired = false;
+      longPressTimer = setTimeout(() => {
+        longPressJustFired = true;
+        openDetailPanel(id);
+        pinnedId = id;
+        applyHighlight(id);
+        if (navigator.vibrate) navigator.vibrate(8);
+      }, 500);
+    }
+  });
+
+  nodesLayer.addEventListener('pointerup', () => { cancelLongPress(); });
+  nodesLayer.addEventListener('pointercancel', () => { cancelLongPress(); });
+
+  nodesLayer.addEventListener('contextmenu', (e) => {
+    const node = e.target.closest('.node');
+    if (!node) return;
+    e.preventDefault();
+    const id = node.dataset.id;
+    openDetailPanel(id);
+    pinnedId = id;
+    applyHighlight(id);
+  });
+
+  nodesLayer.addEventListener('click', (e) => {
+    const node = e.target.closest('.node');
+    if (!node) return;
+    if (longPressJustFired) { longPressJustFired = false; return; }
+    const id = node.dataset.id;
+
+    if (e.detail === 2) {
+      focusOnSubtree(id);
+      return;
+    }
+
+    if (pinnedId === id) {
+      pinnedId = null;
+      applyHighlight(null);
+      hideTooltip();
+    } else {
+      pinnedId = id;
+      applyHighlight(id);
+      if (e.pointerType !== 'touch') positionTooltip(id);
+    }
+  });
+
+  document.getElementById('viewport').addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.node') || e.target.closest('.zoom-controls') || e.target.closest('.minimap')) return;
+    if (pinnedId) {
+      pinnedId = null;
+      applyHighlight(null);
+      hideTooltip();
+    }
+  });
+}
+
+/* =========================================================
+   统计文字 / 默认聚焦视图 / 视图状态与缩放
+   ========================================================= */
+function renderStats() {
+  const total = Object.keys(PEOPLE).length;
+  document.getElementById('stats').innerHTML =
+    `<b>${total}</b> 位人物 · <b>${EVENTS.length}</b> 次非直系继统或监国事件 · <b>${UNIONS.length}</b> 段结合关系`;
+}
+
+const view = { scale: 0.72, x: 0, y: 0, minScale: 0.22, maxScale: 1.8 };
+
+function applyView() {
+  const canvas = document.getElementById('canvas');
+  canvas.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`;
+  document.getElementById('zoomReset').textContent = Math.round(view.scale * 100) + '%';
+  updateMinimapViewport();
+}
+
+function fitToViewport(padding) {
+  const viewport = document.getElementById('viewport');
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  padding = padding || 60;
+  const scaleX = (vw - padding * 2) / CANVAS_W;
+  const scaleY = (vh - padding * 2) / CANVAS_H;
+  view.scale = Math.max(view.minScale, Math.min(view.maxScale, Math.min(scaleX, scaleY)));
+  view.x = (vw - CANVAS_W * view.scale) / 2;
+  view.y = padding;
+  applyView();
+}
+
+const DEFAULT_FOCUS_IDS = ['zuzong4', 'yuanzhang', 'mahuanghou', 'biao', 'di', 'tan', 'gang'];
+
+function focusDefaultView() {
+  const viewport = document.getElementById('viewport');
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+
+  const pts = DEFAULT_FOCUS_IDS.map(id => POS[id]).filter(Boolean);
+  if (!pts.length) { fitToViewport(); return; }
+
+  const minX = Math.min(...pts.map(p => p.x)) - 110;
+  const maxX = Math.max(...pts.map(p => p.x)) + 110;
+  const minY = Math.min(...pts.map(p => p.y)) - 100;
+  const maxY = Math.max(...pts.map(p => p.y)) + 140;
+
+  const w = maxX - minX, h = maxY - minY;
+  const scaleX = vw / w, scaleY = vh / h;
+  view.scale = Math.max(view.minScale, Math.min(view.maxScale, Math.min(scaleX, scaleY, 0.85)));
+  view.x = vw / 2 - (minX + w / 2) * view.scale;
+  view.y = vh * 0.14 - minY * view.scale;
+  applyView();
+}
+
+function zoomAt(factor, cx, cy) {
+  const viewport = document.getElementById('viewport');
+  cx = cx != null ? cx : viewport.clientWidth / 2;
+  cy = cy != null ? cy : viewport.clientHeight / 2;
+
+  const newScale = Math.max(view.minScale, Math.min(view.maxScale, view.scale * factor));
+  const ratio = newScale / view.scale;
+  view.x = cx - (cx - view.x) * ratio;
+  view.y = cy - (cy - view.y) * ratio;
+  view.scale = newScale;
+  applyView();
+}
+
+/* =========================================================
+   迷你地图
+   ========================================================= */
+const MINIMAP_W = 190, MINIMAP_H = 120;
+
+function drawMinimap() {
+  const canvas = document.getElementById('minimapCanvas');
+  canvas.width = MINIMAP_W;
+  canvas.height = MINIMAP_H;
+  const ctx = canvas.getContext('2d');
+
+  ctx.clearRect(0, 0, MINIMAP_W, MINIMAP_H);
+  const scale = Math.min(MINIMAP_W / CANVAS_W, MINIMAP_H / CANVAS_H);
+  const offX = (MINIMAP_W - CANVAS_W * scale) / 2;
+  const offY = (MINIMAP_H - CANVAS_H * scale) / 2;
+
+  ctx.strokeStyle = 'rgba(195,158,79,0.14)';
+  ctx.lineWidth = 1;
+  ROW_Y.forEach(y => {
+    ctx.beginPath();
+    ctx.moveTo(offX, offY + y * scale);
+    ctx.lineTo(offX + CANVAS_W * scale, offY + y * scale);
+    ctx.stroke();
+  });
+
+  Object.entries(POS).forEach(([id, p]) => {
+    const person = PEOPLE[id];
+    if (!person) return;
+    const isEmperor = !person.compressed && person.title && person.title.includes('帝') && !person.title.includes('监国');
+    const r = person.compressed ? 1.1 : (isEmperor ? 1.9 : 1.4);
+    ctx.beginPath();
+    ctx.arc(offX + p.x * scale, offY + p.y * scale, r, 0, Math.PI * 2);
+    ctx.fillStyle = isEmperor ? 'rgba(232,201,126,0.92)' : 'rgba(195,158,79,0.55)';
+    ctx.fill();
+  });
+
+  canvas.dataset.scale = scale;
+  canvas.dataset.offX = offX;
+  canvas.dataset.offY = offY;
+}
+
+function updateMinimapViewport() {
+  const canvas = document.getElementById('minimapCanvas');
+  const vpBox = document.getElementById('minimapViewport');
+  const viewport = document.getElementById('viewport');
+  const scale = parseFloat(canvas.dataset.scale || '0');
+  if (!scale) return;
+  const offX = parseFloat(canvas.dataset.offX || '0');
+  const offY = parseFloat(canvas.dataset.offY || '0');
+
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const canvasLeft = -view.x / view.scale;
+  const canvasTop = -view.y / view.scale;
+  const canvasVW = vw / view.scale;
+  const canvasVH = vh / view.scale;
+
+  vpBox.style.left = (offX + canvasLeft * scale) + 'px';
+  vpBox.style.top = (offY + canvasTop * scale) + 'px';
+  vpBox.style.width = (canvasVW * scale) + 'px';
+  vpBox.style.height = (canvasVH * scale) + 'px';
+}
+
+function minimapToCanvasXY(mx, my) {
+  const canvas = document.getElementById('minimapCanvas');
+  const scale = parseFloat(canvas.dataset.scale || '0');
+  const offX = parseFloat(canvas.dataset.offX || '0');
+  const offY = parseFloat(canvas.dataset.offY || '0');
+  return { x: (mx - offX) / scale, y: (my - offY) / scale };
+}
+
+function centerViewOnCanvasXY(cx, cy) {
+  const viewport = document.getElementById('viewport');
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  view.x = vw / 2 - cx * view.scale;
+  view.y = vh / 2 - cy * view.scale;
+  applyView();
+}
+
+function initMinimap() {
+  drawMinimap();
+  const canvas = document.getElementById('minimapCanvas');
+  function jumpTo(e) {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const c = minimapToCanvasXY(mx, my);
+    centerViewOnCanvasXY(c.x, c.y);
+  }
+  canvas.addEventListener('pointerdown', (e) => {
+    jumpTo(e);
+    const onMove = (ev) => jumpTo(ev);
+    const onUp = () => {
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+    };
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+  });
+}
+
+/* =========================================================
+   Header / Footnote 折叠
+   ========================================================= */
+function initHeaderToggle() {
+  const topbar = document.getElementById('topbar');
+  const btn = document.getElementById('headerToggle');
+  btn.addEventListener('click', () => {
+    const collapsed = topbar.classList.toggle('collapsed');
+    btn.setAttribute('aria-expanded', String(!collapsed));
+    btn.setAttribute('aria-label', collapsed ? '展开表头' : '收起表头');
+  });
+}
+
+function initFootNoteToggle() {
+  const btn = document.getElementById('footNoteToggle');
+  const full = document.getElementById('footNoteFull');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const expanded = full.classList.toggle('expanded');
+    btn.setAttribute('aria-expanded', String(expanded));
+  });
+}
+
+/* =========================================================
+   拖动平移 / 触屏双指缩放
+   ========================================================= */
+function distance(t1, t2) {
+  return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+}
+function midpoint(t1, t2) {
+  return { x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 };
+}
+
+function initPanZoom() {
+  const viewport = document.getElementById('viewport');
+  let dragging = false;
+  let dragStart = null;
+  let viewStart = null;
+  let cancelSingleDrag = false;
+  const activePointers = new Map();
+  let pinchStartDist = null;
+  let pinchStartScale = null;
+  let pinchStartMid = null;
+  let pinchStartView = null;
+
+  function endDrag() {
+    dragging = false;
+    dragStart = null;
+    viewStart = null;
+    viewport.classList.remove('grabbing');
+  }
+
+  viewport.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const rect = viewport.getBoundingClientRect();
+    const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+    const factor = Math.pow(1.0016, -e.deltaY);
+    zoomAt(factor, cx, cy);
+  }, { passive: false });
+
+  viewport.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.node') || e.target.closest('.zoom-controls') || e.target.closest('.minimap')) {
+      cancelSingleDrag = true;
+      return;
+    }
+    cancelSingleDrag = false;
+    activePointers.set(e.pointerId, e);
+
+    if (activePointers.size === 1) {
+      dragging = true;
+      dragStart = { x: e.clientX, y: e.clientY };
+      viewStart = { x: view.x, y: view.y };
+      viewport.classList.add('grabbing');
+      viewport.setPointerCapture(e.pointerId);
+    } else if (activePointers.size === 2) {
+      dragging = false;
+      const pts = [...activePointers.values()];
+      pinchStartDist = distance(pts[0], pts[1]);
+      pinchStartScale = view.scale;
+      const rect = viewport.getBoundingClientRect();
+      const mid = midpoint(pts[0], pts[1]);
+      pinchStartMid = { x: mid.x - rect.left, y: mid.y - rect.top };
+      pinchStartView = { x: view.x, y: view.y };
+    }
+  });
+
+  viewport.addEventListener('pointermove', (e) => {
+    if (cancelSingleDrag) return;
+    if (activePointers.has(e.pointerId)) activePointers.set(e.pointerId, e);
+
+    if (activePointers.size === 2 && pinchStartDist) {
+      const pts = [...activePointers.values()];
+      const newDist = distance(pts[0], pts[1]);
+      const scaleFactor = newDist / pinchStartDist;
+      const newScale = Math.max(view.minScale, Math.min(view.maxScale, pinchStartScale * scaleFactor));
+      const ratio = newScale / pinchStartScale;
+      view.x = pinchStartMid.x - (pinchStartMid.x - pinchStartView.x) * ratio;
+      view.y = pinchStartMid.y - (pinchStartMid.y - pinchStartView.y) * ratio;
+      view.scale = newScale;
+      applyView();
+      return;
+    }
+
+    if (!dragging || !dragStart) return;
+    view.x = viewStart.x + (e.clientX - dragStart.x);
+    view.y = viewStart.y + (e.clientY - dragStart.y);
+    applyView();
+  });
+
+  function onPointerUp(e) {
+    activePointers.delete(e.pointerId);
+    if (activePointers.size < 2) {
+      pinchStartDist = null;
+    }
+    if (activePointers.size === 0) endDrag();
+  }
+  viewport.addEventListener('pointerup', onPointerUp);
+  viewport.addEventListener('pointercancel', onPointerUp);
+
+  document.getElementById('zoomIn').addEventListener('click', () => zoomAt(1.25));
+  document.getElementById('zoomOut').addEventListener('click', () => zoomAt(0.8));
+  document.getElementById('zoomReset').addEventListener('click', () => focusDefaultView());
+}
+
+/* =========================================================
+   搜索
+   ========================================================= */
+function normalizeQuery(q) { return (q || '').trim(); }
+
+function searchPeople(rawQuery) {
+  const q = normalizeQuery(rawQuery);
+  if (!q) return [];
+  const qLower = q.toLowerCase();
+  return Object.keys(PEOPLE).filter(id => {
+    const p = PEOPLE[id];
+    return p.zh.includes(q) ||
+      (p.title && p.title.includes(q)) ||
+      (p.role && p.role.includes(q)) ||
+      id.toLowerCase().includes(qLower);
+  }).slice(0, 30);
+}
+
+function renderSearchResults(ids, query) {
+  const box = document.getElementById('searchResults');
+  if (!ids.length) {
+    box.innerHTML = `<div class="search-empty">未找到与"${query}"相关的人物</div>`;
+    box.classList.add('show');
+    return;
+  }
+  box.innerHTML = ids.map((id, i) => {
+    const p = PEOPLE[id];
+    return `<div class="search-result-item" data-id="${id}" data-idx="${i}" role="option">
+      <span class="search-result-zh">${p.zh}</span>
+      <span class="search-result-role">${p.title}</span>
+    </div>`;
+  }).join('');
+  box.classList.add('show');
+}
+
+function focusOnNode(id, opts) {
+  opts = opts || {};
+  const p = POS[id];
+  if (!p) return;
+  const viewport = document.getElementById('viewport');
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  if (opts.scale) view.scale = Math.max(view.minScale, Math.min(view.maxScale, opts.scale));
+  view.x = vw / 2 - p.x * view.scale;
+  view.y = vh / 2 - p.y * view.scale;
+  applyView();
+
+  pinnedId = id;
+  applyHighlight(id);
+  const nodeEl = document.querySelector(`.node[data-id="${id}"]`);
+  if (nodeEl) nodeEl.focus({ preventScroll: true });
+}
+
+function collectDescendants(id, acc) {
+  acc = acc || new Set();
+  acc.add(id);
+  Object.entries(PEOPLE).forEach(([cid, cp]) => {
+    if ((cp.parents || []).includes(id) && !acc.has(cid)) {
+      collectDescendants(cid, acc);
+    }
+  });
+  return acc;
+}
+
+function focusOnSubtree(id) {
+  const ids = [...collectDescendants(id)];
+  const pts = ids.map(i => POS[i]).filter(Boolean);
+  if (!pts.length) return;
+
+  const viewport = document.getElementById('viewport');
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const minX = Math.min(...pts.map(p => p.x)) - 110;
+  const maxX = Math.max(...pts.map(p => p.x)) + 110;
+  const minY = Math.min(...pts.map(p => p.y)) - 100;
+  const maxY = Math.max(...pts.map(p => p.y)) + 140;
+  const w = maxX - minX, h = maxY - minY;
+
+  view.scale = Math.max(view.minScale, Math.min(view.maxScale, Math.min(vw / w, vh / h, 1.2)));
+  view.x = vw / 2 - (minX + w / 2) * view.scale;
+  view.y = vh / 2 - (minY + h / 2) * view.scale;
+  applyView();
+
+  pinnedId = id;
+  applyHighlight(id);
+}
+
+function initSearch() {
+  const input = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('searchClear');
+  const results = document.getElementById('searchResults');
+  let activeIdx = -1;
+  let currentIds = [];
+
+  function runSearch() {
+    const q = input.value;
+    clearBtn.classList.toggle('show', q.length > 0);
+    if (!q.trim()) { results.classList.remove('show'); currentIds = []; activeIdx = -1; return; }
+    currentIds = searchPeople(q);
+    activeIdx = -1;
+    renderSearchResults(currentIds, q.trim());
+  }
+
+  function updateActiveItem() {
+    results.querySelectorAll('.search-result-item').forEach((el, i) => {
+      el.classList.toggle('kb-active', i === activeIdx);
+    });
+    const activeEl = results.querySelector('.search-result-item.kb-active');
+    if (activeEl) activeEl.scrollIntoView({ block: 'nearest' });
+  }
+
+  function selectSearchResult(id) {
+    focusOnNode(id, { scale: 1 });
+    results.classList.remove('show');
+    input.value = PEOPLE[id].zh;
+    clearBtn.classList.add('show');
+  }
+
+  input.addEventListener('input', runSearch);
+  input.addEventListener('focus', () => { if (currentIds.length) results.classList.add('show'); });
+
+  input.addEventListener('keydown', (e) => {
+    if (!currentIds.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIdx = Math.min(currentIds.length - 1, activeIdx + 1);
+      updateActiveItem();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIdx = Math.max(0, activeIdx - 1);
+      updateActiveItem();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const id = activeIdx >= 0 ? currentIds[activeIdx] : currentIds[0];
+      if (id) selectSearchResult(id);
+    } else if (e.key === 'Escape') {
+      results.classList.remove('show');
+      input.blur();
+    }
+  });
+
+  results.addEventListener('click', (e) => {
+    const item = e.target.closest('.search-result-item');
+    if (!item) return;
+    selectSearchResult(item.dataset.id);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    input.value = '';
+    results.classList.remove('show');
+    clearBtn.classList.remove('show');
+    currentIds = [];
+    input.focus();
+  });
+
+  document.addEventListener('pointerdown', (e) => {
+    if (!e.target.closest('.search-wrap')) results.classList.remove('show');
+  });
+}
+
+/* =========================================================
+   分支筛选（对应建议文档"五个分支筛选器"）
+   ========================================================= */
+const BRANCH_META = {
+  main:     { label: '皇统主线 · 洪武—崇祯' },
+  jianwen:  { label: '洪武 · 建文支' },
+  xingwang: { label: '兴王入继支' },
+  nanming:  { label: '南明诸帝' },
+  fanwang:  { label: '重要藩王支' }
+};
+
+let activeBranch = null;
+
+function renderBranchFilter() {
+  const box = document.getElementById('branchFilter');
+  box.innerHTML = Object.entries(BRANCH_META).map(([key, meta]) =>
+    `<button class="branch-btn" data-branch="${key}" type="button">${meta.label}</button>`
+  ).join('');
+}
+
+function applyBranchFilter(branch) {
+  activeBranch = activeBranch === branch ? null : branch;
+
+  document.querySelectorAll('.branch-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.branch === activeBranch);
+  });
+
+  document.querySelectorAll('.node').forEach(el => {
+    if (!activeBranch) { el.classList.remove('branch-hidden'); return; }
+    const p = PEOPLE[el.dataset.id];
+    el.classList.toggle('branch-hidden', !(p.branches || []).includes(activeBranch));
+  });
+
+  document.querySelectorAll('#connectors path, #connectors circle').forEach(el => {
+    if (!activeBranch) { el.classList.remove('branch-hidden'); return; }
+    const ids = [
+      el.dataset.a, el.dataset.b, el.dataset.child,
+      ...(el.dataset.parents ? el.dataset.parents.split(',') : [])
+    ].filter(Boolean);
+    const allMatch = ids.length > 0 && ids.every(id => PEOPLE[id] && (PEOPLE[id].branches || []).includes(activeBranch));
+    el.classList.toggle('branch-hidden', !allMatch);
+  });
+
+  // 事件连线天然跨越不同分支（例如"靖难之役"连接建文支与皇统主线），
+  // 故采用"任一端点属于该分支"即视为相关，而非血缘线的"两端都须属于"。
+  document.querySelectorAll('#events path, #events text').forEach(el => {
+    if (!activeBranch) { el.classList.remove('branch-hidden'); return; }
+    const from = PEOPLE[el.dataset.from], to = PEOPLE[el.dataset.to];
+    const anyMatch = (from && (from.branches || []).includes(activeBranch)) ||
+                      (to && (to.branches || []).includes(activeBranch));
+    el.classList.toggle('branch-hidden', !anyMatch);
+  });
+}
+
+function initBranchFilter() {
+  renderBranchFilter();
+  document.getElementById('branchFilter').addEventListener('click', (e) => {
+    const btn = e.target.closest('.branch-btn');
+    if (!btn) return;
+    applyBranchFilter(btn.dataset.branch);
+  });
+}
+
+/* =========================================================
+   图例筛选（连线类型 / "追尊·未正式在位"节点状态）
+   ========================================================= */
+let activeLegendFilter = null;
+const LEGEND_LINE_CLASS = {
+  blood: ['line-blood', 'line-special'],
+  union: ['line-union'],
+  transfer: ['line-transfer'],
+  restore: ['line-restore', 'line-fraternal']
+};
+
+function applyLegendFilter(type) {
+  activeLegendFilter = activeLegendFilter === type ? null : type;
+
+  document.querySelectorAll('.legend-item').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filterType === activeLegendFilter);
+  });
+
+  document.querySelectorAll('#connectors path, #connectors circle, #events path, #events text').forEach(el => {
+    if (!activeLegendFilter || activeLegendFilter === 'posthumous') {
+      el.classList.remove('legend-hidden');
+      return;
+    }
+    const wanted = LEGEND_LINE_CLASS[activeLegendFilter] || [];
+    const matches = wanted.some(c => el.classList.contains(c));
+    el.classList.toggle('legend-hidden', !matches);
+  });
+
+  document.querySelectorAll('.node').forEach(el => {
+    if (activeLegendFilter !== 'posthumous') { el.classList.remove('legend-hidden'); return; }
+    const p = PEOPLE[el.dataset.id];
+    el.classList.toggle('legend-hidden', !(p.posthumous || p.deposed));
+  });
+}
+
+function initLegendFilter() {
+  document.querySelectorAll('.legend-item').forEach(btn => {
+    btn.addEventListener('click', () => applyLegendFilter(btn.dataset.filterType));
+  });
+}
+
+/* =========================================================
+   启动
+   ========================================================= */
+function init() {
+  const canvas = document.getElementById('canvas');
+  canvas.style.width = CANVAS_W + 'px';
+  canvas.style.height = CANVAS_H + 'px';
+
+  renderGenBands();
+  renderConnectors();
+  renderEventConnectors();
+  renderNodes();
+  renderStats();
+
+  initDetailPanel();
+  initInteractions();
+  initBranchFilter();
+  initLegendFilter();
+  initSearch();
+  initMinimap();
+  initPanZoom();
+  initHeaderToggle();
+  initFootNoteToggle();
+
+  focusDefaultView();
+  window.addEventListener('resize', () => { drawMinimap(); });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
