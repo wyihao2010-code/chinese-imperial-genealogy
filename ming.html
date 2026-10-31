@@ -2555,7 +2555,7 @@ function initInteractions() {
         openDetailPanel(id);
         pinnedId = id;
         applyHighlight(id);
-        if (navigator.vibrate) navigator.vibrate(8);
+
       }, 500);
     }
   });
@@ -2821,13 +2821,38 @@ function initPanZoom() {
     viewport.classList.remove('grabbing');
   }
 
-  viewport.addEventListener('wheel', (e) => {
-    e.preventDefault();
+  // 缩放按“滚动距离”累积，而非每个事件固定倍率：触控板一次手势会连发几十个小增量事件，
+  // 原先每个事件都乘 1.12 会瞬间放大/缩小到极限。这里：单次事件增量限幅 → 乘以较小灵敏度
+  // → 累积到 zAcc → 每帧最多推进 4%，剩余部分留到下一帧，使缩放行程更长、更平滑。
+  let zAcc = 0, zRaf = 0, zX = 0, zY = 0;
+  const Z_FRAME_MAX = Math.log(1.04);
+  function zStep() {
+    zRaf = 0;
+    const step = Math.max(-Z_FRAME_MAX, Math.min(Z_FRAME_MAX, zAcc));
+    zAcc -= step;
+    zoomAt(Math.exp(step), zX, zY);
+    if (Math.abs(zAcc) > 0.001) zRaf = requestAnimationFrame(zStep); else zAcc = 0;
+  }
+  function queueZoom(delta, x, y) {
+    zAcc = Math.max(-0.3, Math.min(0.3, zAcc + delta));
     const rect = viewport.getBoundingClientRect();
-    const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
-    const factor = Math.pow(1.0016, -e.deltaY);
-    zoomAt(factor, cx, cy);
+    zX = x - rect.left; zY = y - rect.top;
+    if (!zRaf) zRaf = requestAnimationFrame(zStep);
+  }
+  viewport.addEventListener('wheel', e => {
+    e.preventDefault();
+    let dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1);
+    dy = Math.max(-50, Math.min(50, dy));
+    queueZoom(-dy * (e.ctrlKey ? 0.003 : 0.0016), e.clientX, e.clientY);
   }, { passive: false });
+  // Safari 触控板捏合使用 gesture 事件
+  let gLast = 1;
+  viewport.addEventListener('gesturestart', e => { e.preventDefault(); gLast = 1; });
+  viewport.addEventListener('gesturechange', e => {
+    e.preventDefault();
+    queueZoom(Math.log(e.scale / gLast) * 0.5, e.clientX, e.clientY);
+    gLast = e.scale;
+  });
 
   viewport.addEventListener('pointerdown', (e) => {
     if (e.target.closest('.node') || e.target.closest('.zoom-controls') || e.target.closest('.minimap')) {
@@ -2855,6 +2880,8 @@ function initPanZoom() {
     }
   });
 
+  viewport.addEventListener('dragstart', e => e.preventDefault());
+  viewport.addEventListener('selectstart', e => { if (dragging) e.preventDefault(); });
   viewport.addEventListener('pointermove', (e) => {
     if (cancelSingleDrag) return;
     if (activePointers.has(e.pointerId)) activePointers.set(e.pointerId, e);
