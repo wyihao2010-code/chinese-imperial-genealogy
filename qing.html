@@ -240,13 +240,16 @@
     flex: 1 1 auto;
     overflow: hidden;
     position: relative;
-    cursor: grab;
+    cursor: default;
     touch-action: none;
     background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
     background-size: 34px 34px;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
   }
 
-  main.tree-viewport.grabbing { cursor: grabbing; }
+  main.tree-viewport.grabbing { cursor: default; }
 
   .tree-canvas {
     position: absolute;
@@ -2453,9 +2456,11 @@ function initPanZoom() {
 
   viewport.addEventListener('pointerdown', e => {
     if (e.target.closest('.node') || e.target.closest('.zoom-controls')) return;
+    if (e.pointerType === 'mouse' && e.button === 0) e.preventDefault();
 
     activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    viewport.setPointerCapture(e.pointerId);
+    // 鼠标由 window 跟踪，触摸仍捕获指针以支持双指缩放。
+    if (e.pointerType !== 'mouse') viewport.setPointerCapture(e.pointerId);
 
     if (activePointers.size === 2) {
       // 第二指落下：切换到双指缩放模式，取消单指拖拽状态避免二者打架导致画面跳动
@@ -2484,7 +2489,7 @@ function initPanZoom() {
 
   viewport.addEventListener('dragstart', e => e.preventDefault());
   viewport.addEventListener('selectstart', e => { if (dragging) e.preventDefault(); });
-  viewport.addEventListener('pointermove', e => {
+  window.addEventListener('pointermove', e => {
     if (!activePointers.has(e.pointerId)) return;
     activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
@@ -2538,8 +2543,8 @@ function initPanZoom() {
       hideTooltip();
     }
   }
-  viewport.addEventListener('pointerup', endDrag);
-  viewport.addEventListener('pointercancel', endDrag);
+  window.addEventListener('pointerup', endDrag);
+  window.addEventListener('pointercancel', endDrag);
 
   // 缩放按“滚动距离”累积，而非每个事件固定倍率：触控板一次手势会连发几十个小增量事件，
   // 原先每个事件都乘 1.12 会瞬间放大/缩小到极限。这里：单次事件增量限幅 → 乘以较小灵敏度

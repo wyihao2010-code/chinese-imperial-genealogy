@@ -252,16 +252,17 @@
     flex: 1 1 auto;
     overflow: hidden;
     position: relative;
-    cursor: grab;
+    cursor: default;
     touch-action: none;
     background-image: radial-gradient(rgba(255,255,255,0.035) 1px, transparent 1px);
     background-size: 34px 34px;
     -webkit-user-select: none;
     -moz-user-select: none;
     user-select: none;
+    -webkit-user-drag: none;
   }
 
-  main.tree-viewport.grabbing { cursor: grabbing; }
+  main.tree-viewport.grabbing { cursor: default; }
 
   .tree-canvas {
     position: absolute;
@@ -2859,6 +2860,7 @@ function initPanZoom() {
       cancelSingleDrag = true;
       return;
     }
+    if (e.pointerType === 'mouse' && e.button === 0) e.preventDefault();
     cancelSingleDrag = false;
     activePointers.set(e.pointerId, e);
 
@@ -2867,7 +2869,8 @@ function initPanZoom() {
       dragStart = { x: e.clientX, y: e.clientY };
       viewStart = { x: view.x, y: view.y };
       viewport.classList.add('grabbing');
-      viewport.setPointerCapture(e.pointerId);
+      // 鼠标由 window 跟踪，触摸仍捕获指针以支持双指缩放。
+      if (e.pointerType !== 'mouse') viewport.setPointerCapture(e.pointerId);
     } else if (activePointers.size === 2) {
       dragging = false;
       const pts = [...activePointers.values()];
@@ -2882,7 +2885,7 @@ function initPanZoom() {
 
   viewport.addEventListener('dragstart', e => e.preventDefault());
   viewport.addEventListener('selectstart', e => { if (dragging) e.preventDefault(); });
-  viewport.addEventListener('pointermove', (e) => {
+  window.addEventListener('pointermove', (e) => {
     if (cancelSingleDrag) return;
     if (activePointers.has(e.pointerId)) activePointers.set(e.pointerId, e);
 
@@ -2912,8 +2915,8 @@ function initPanZoom() {
     }
     if (activePointers.size === 0) endDrag();
   }
-  viewport.addEventListener('pointerup', onPointerUp);
-  viewport.addEventListener('pointercancel', onPointerUp);
+  window.addEventListener('pointerup', onPointerUp);
+  window.addEventListener('pointercancel', onPointerUp);
 
   document.getElementById('zoomIn').addEventListener('click', () => zoomAt(1.25));
   document.getElementById('zoomOut').addEventListener('click', () => zoomAt(0.8));
