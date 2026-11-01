@@ -50,6 +50,9 @@ def parse_page(filename):
 
 
 class SiteNavigationTest(unittest.TestCase):
+    def test_portal_links_back_to_portfolio(self):
+        self.assertIn('href="https://wyihao2010-code.github.io/portfolio/"', (ROOT / "index.html").read_text(encoding="utf-8"))
+
     def assert_navigation(self, filename, expected_links):
         page = parse_page(filename)
         actual_links = {
@@ -58,6 +61,8 @@ class SiteNavigationTest(unittest.TestCase):
         }
         self.assertEqual(expected_links, actual_links)
         for href in actual_links:
+            if href.startswith("https://"):
+                continue
             self.assertTrue(
                 (ROOT / href.removeprefix("./")).is_file(),
                 f"{filename} 指向不存在的页面：{href}",
@@ -66,13 +71,13 @@ class SiteNavigationTest(unittest.TestCase):
     def test_ming_has_home_and_qing_navigation(self):
         self.assert_navigation(
             "ming.html",
-            {"./index.html": "返回首页", "./qing.html": "切换至大清"},
+            {"./index.html": "返回首页", "./qing.html": "切换至大清", "https://wyihao2010-code.github.io/portfolio/": "返回作品集"},
         )
 
     def test_qing_has_home_and_ming_navigation(self):
         self.assert_navigation(
             "qing.html",
-            {"./index.html": "返回首页", "./ming.html": "切换至大明"},
+            {"./index.html": "返回首页", "./ming.html": "切换至大明", "https://wyihao2010-code.github.io/portfolio/": "返回作品集"},
         )
 
 
